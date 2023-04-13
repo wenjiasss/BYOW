@@ -25,15 +25,32 @@ public class World {
     private final TETile[][] tiles;
 
 
+    private class pair {
+        private final int x;
+        private final int y;
+
+        public pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public int getX() {
+            return this.x;
+        }
+
+        public int getY() {
+            return this.y;
+        }
+    }
+
+
     public World(String seed, int width, int height) {
         Long s = Long.parseLong(seed);
         this.RANDOM = new Random(s);
         this.w = width;
         this.h = height;
 
-        int numRooms = RANDOM.nextInt(5, 15);
-        int numHalls = RANDOM.nextInt(30, 50);
-        int curRooms = 0;
+        int numHalls = RANDOM.nextInt(20, 30);
         int curHalls = 0;
 
         tiles = new TETile[w][h];
@@ -48,49 +65,78 @@ public class World {
             curHalls++;
         }
 
-       /*
-        while (curRooms <= numRooms) {
-            int startx = RANDOM.nextInt(3, w - 5);
-            int starty = RANDOM.nextInt(3, h - 5);
-            pair start = new pair(startx, starty); // left bottom
-
-            int endx = RANDOM.nextInt(startx + 2, w - 3);
-            int endy = RANDOM.nextInt(starty + 2, h - 3);
-            pair end = new pair(endx, endy); //top right
-
-            int centerx = (startx + endx) / 2;
-            int centery = (starty + endy) / 2;
-            pair center = new pair(centerx, centery); //center
-
-            //check for overlap
-            if (!overlap(start, end)) {
-                createRoom(start, end);
-                LeftBottom.add(start);
-                RightTop.add(end);
-                Center.add(center);
+        /*for (int i = 0; i < hallDirection.size(); i++) {
+            if (hallDirection.get(i)==0) {
+                generateRoom1(i);
+            } else {
+                generateRoom1(i);
             }
-
-            curRooms++;
         }*/
     }
 
-    public static void main(String[] args) {
-        // Change these parameters as necessary
-        int a = 50;
-        int b = 30;
+    // generate Rooms on start and end of vertical hallways
+    private void generateRoom1(int index) {
+        int startx = RANDOM.nextInt(3, w - 5);
+        int starty = RANDOM.nextInt(3, h - 5);
+        pair start = new pair(startx, starty); // left bottom
 
-        World knightWorld = new World("1221", a, b);
+        int endx = RANDOM.nextInt(startx + 2, w - 3);
+        int endy = RANDOM.nextInt(starty + 2, h - 3);
+        pair end = new pair(endx, endy); //top right
 
-        TERenderer ter = new TERenderer();
-        ter.initialize(a, b);
-        ter.renderFrame(knightWorld.getTiles());
+        int centerx = (startx + endx) / 2;
+        int centery = (starty + endy) / 2;
+        pair center = new pair(centerx, centery); //center
 
+        //check for overlap
+        if (!overlap(start, end)) {
+            createRoom(start, end);
+            LeftBottom.add(start);
+            RightTop.add(end);
+            Center.add(center);
+        }
+
+    }
+
+    private void createRoom(pair start, pair end) {
+        for (int i = start.getX(); i <= end.getX(); i++) {
+            for (int j = start.getY(); j <= end.getY(); j++) {
+                tiles[i][j] = Tileset.FLOOR;
+            }
+        }
+        for (int i = start.getX()-1; i <= end.getX()+1; i++) {
+            tiles[i][start.getY()-1] = Tileset.WALL;
+            tiles[i][end.getY()+1] = Tileset.WALL;
+        }
+        for (int j = start.getY()-1; j <= end.getY()+1; j++) {
+            tiles[start.getX()-1][j] = Tileset.WALL;
+            tiles[end.getX()+1][j] = Tileset.WALL;
+        }
+    }
+
+    //check if randomly generated room overlaps with previous room in leftbottom and rightop
+    public boolean overlap(pair start, pair end) {
+        if (LeftBottom != null && RightTop != null) {
+            //creates rectangle for randomly generated room
+            Rectangle r1 = new Rectangle(start.getX(), start.getY(), end.getX() - start.getX(), end.getY() - start.getY());
+            for (int i = 0; i < LeftBottom.size(); i++) {
+                pair l = LeftBottom.get(i);
+                pair r = RightTop.get(i);
+                int oldLength = Math.abs(l.y - r.y);
+                int oldWidth = Math.abs(l.x - r.x);
+                Rectangle r2 = new Rectangle(l.getX(), l.getY(), oldWidth, oldLength);
+                if (r2.intersects(r1)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void generateHall() {
         // generate start point using RANDOM
-        int startx = RANDOM.nextInt(5, w - 4);
-        int starty = RANDOM.nextInt(5, h - 4);
+        int startx = RANDOM.nextInt(7, w - 6);
+        int starty = RANDOM.nextInt(7, h - 6);
         pair start = new pair(startx, starty);
         // generate direction hallway continues using RANDOM
         int direction = RANDOM.nextInt(0, 4); // 0=up, 1=down, 2=right, 3=left
@@ -98,23 +144,23 @@ public class World {
         int endx = startx;
         int endy = starty;
         if (direction <= 1) {
-            int lenUp = h - 3 - starty;
-            int lenDown = starty - 3;
+            int lenUp = h - 5 - starty;
+            int lenDown = starty - 5;
             if (lenUp >= lenDown) {
-                endy = h - 3;
+                endy = h - 5;
                 direction = 0;
             } else {
-                endy = 3;
+                endy = 5;
                 direction = 1;
             }
         } else if (direction >= 2) {
-            int lenRight = w - 3 - startx;
-            int lenLeft = startx - 3;
+            int lenRight = w - 5 - startx;
+            int lenLeft = startx - 5;
             if (lenRight >= lenLeft) {
-                endx = w - 3;
+                endx = w - 5;
                 direction = 2;
             } else {
-                endx = 3;
+                endx = 5;
                 direction = 3;
             }
         }
@@ -147,7 +193,8 @@ public class World {
                 tiles[x][y] = Tileset.WALL;
                 tiles[x + 1][y] = Tileset.WALL;
             } else if (tiles[x][y] == Tileset.WALL && tiles[x][y + 1] == Tileset.FLOOR) {
-                a = y + 2;
+                tiles[x][y+2] = Tileset.FLOOR;
+                a = a + 2;
             }
             // create middle section of hallway
             for (int i = a; i < end.getY(); i++) {
@@ -203,7 +250,8 @@ public class World {
                 tiles[x][y] = Tileset.WALL;
                 tiles[x][y + 1] = Tileset.WALL;
             } else if (tiles[x][y] == Tileset.WALL && tiles[x + 1][y] == Tileset.FLOOR) {
-                a = a + 1;
+                tiles[x+2][y] = Tileset.FLOOR;
+                a = a + 2;
             }
             // create middle section of hallway
             for (int i = a; i < end.getX(); i++) {
@@ -258,18 +306,18 @@ public class World {
     // Check if this hallway is seperate from all existing hallways that go in same direction
     private boolean seperateHall(pair start, int direction) {
         boolean result = true;
-        if (direction == 0) { // check x
+        if (direction <= 1) { // check x
             for (int i = 0; i < hallDirection.size(); i++) {
-                if (hallDirection.get(i) == 0) {
+                if (hallDirection.get(i) <= 1) {
                     int p = hallStart.get(i).getX();
                     if (p - 3 <= start.getX() && start.getX() <= p + 3) {
                         result = false;
                     }
                 }
             }
-        } else if (direction == 2) { // check y
+        } else if (direction >= 2) { // check y
             for (int i = 0; i < hallDirection.size(); i++) {
-                if (hallDirection.get(i) == 2) {
+                if (hallDirection.get(i) >= 2) {
                     int p = hallStart.get(i).getY();
                     if (p - 3 <= start.getY() && start.getY() <= p + 3) {
                         result = false;
@@ -280,61 +328,24 @@ public class World {
         return result;
     }
 
-
-    //check if randomly generated room overlaps with previous room in leftbottom and rightop
-    public boolean overlap(pair start, pair end) {
-        if (LeftBottom != null && RightTop != null) {
-            //creates rectangle for randomly generated room
-            Rectangle r1 = new Rectangle(start.getX(), start.getY(), end.getX() - start.getX(), end.getY() - start.getY());
-            for (int i = 0; i < LeftBottom.size(); i++) {
-                pair l = LeftBottom.get(i);
-                pair r = RightTop.get(i);
-                int oldLength = Math.abs(l.y - r.y);
-                int oldWidth = Math.abs(l.x - r.x);
-                Rectangle r2 = new Rectangle(l.getX(), l.getY(), oldWidth, oldLength);
-                if (r2.intersects(r1)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void createRoom(pair start, pair end) {
-        for (int i = start.getX() + 1; i < end.getX(); i++) {
-            for (int j = start.getY() + 1; j < end.getY(); j++) {
-                tiles[i][j] = Tileset.FLOOR;
-            }
-        }
-        for (int i = start.getX(); i <= end.getX(); i++) {
-            tiles[i][start.getY()] = Tileset.WALL;
-            tiles[i][end.getY()] = Tileset.WALL;
-        }
-        for (int j = start.getY(); j <= end.getY(); j++) {
-            tiles[start.getX()][j] = Tileset.WALL;
-            tiles[end.getX()][j] = Tileset.WALL;
-        }
-    }
-
     public TETile[][] getTiles() {
         return tiles;
     }
 
-    private class pair {
-        private final int x;
-        private final int y;
+    public void printDirection() {
+        System.out.println(hallDirection);
+    }
 
-        public pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
+    public static void main(String[] args) {
+        // Change these parameters as necessary
+        int a = 80;
+        int b = 50;
 
-        public int getX() {
-            return this.x;
-        }
+        World knightWorld = new World("1111", a, b);
 
-        public int getY() {
-            return this.y;
-        }
+        TERenderer ter = new TERenderer();
+        ter.initialize(a, b);
+        ter.renderFrame(knightWorld.getTiles());
+        knightWorld.printDirection();
     }
 }
