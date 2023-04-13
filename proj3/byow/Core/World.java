@@ -6,6 +6,8 @@ import byow.TileEngine.Tileset;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.awt.*;
+import java.util.*;
 
 public class World {
     /* Feel free to change the width and height. */
@@ -63,6 +65,7 @@ public class World {
             }
         }
 
+<<<<<<< HEAD
         while (curHalls <= numHalls) {
             generateHall();
             curHalls++;
@@ -75,10 +78,15 @@ public class World {
         /*while (curRooms <= numRooms) {
             int startx = RANDOM.nextInt(3, w-5);
             int starty = RANDOM.nextInt(3, h-5);
+=======
+        while (curRooms <= numRooms) {
+            int startx = RANDOM.nextInt(3, w - 5);
+            int starty = RANDOM.nextInt(3, h - 5);
+>>>>>>> a4d4457a256b80af1f63ebfc1a16f7e6b323e77d
             pair start = new pair(startx, starty); // left bottom
 
-            int endx = RANDOM.nextInt(startx+2, w-3);
-            int endy = RANDOM.nextInt(starty+2, h-3);
+            int endx = RANDOM.nextInt(startx + 2, w - 3);
+            int endy = RANDOM.nextInt(starty + 2, h - 3);
             pair end = new pair(endx, endy); //top right
 
             int centerx = (startx + endx) / 2;
@@ -312,8 +320,8 @@ public class World {
     }
 
     private void createRoom(pair start, pair end) {
-        for (int i = start.getX()+1; i < end.getX(); i++) {
-            for (int j = start.getY()+1; j < end.getY(); j++) {
+        for (int i = start.getX() + 1; i < end.getX(); i++) {
+            for (int j = start.getY() + 1; j < end.getY(); j++) {
                 tiles[i][j] = Tileset.FLOOR;
             }
         }
