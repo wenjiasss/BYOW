@@ -4,48 +4,26 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
-import java.awt.*;
-import java.util.*;
 
 public class World {
+    private final ArrayList<pair> hallStart = new ArrayList<>();
+    private final ArrayList<pair> hallEnd = new ArrayList<>();
+    private final ArrayList<Integer> hallDirection = new ArrayList<>();
+    private final ArrayList<pair> LeftBottom = new ArrayList<>();
+    private final ArrayList<pair> RightTop = new ArrayList<>();
+    private final ArrayList<pair> Center = new ArrayList<>();
+    private final int X = 0;
+    private final int Y = 0;
     /* Feel free to change the width and height. */
     public int w;
     public int h;
     TERenderer ter = new TERenderer();
     private final Random RANDOM;
-    private final ArrayList<pair> hallStart = new ArrayList<>();
-    private final ArrayList<pair> hallEnd = new ArrayList<>();
-    private final ArrayList<Integer> hallDirection = new ArrayList<>();
-
-    private final ArrayList<pair> LeftBottom = new ArrayList<>();
-    private final ArrayList<pair> RightTop = new ArrayList<>();
-    private final ArrayList<pair> Center = new ArrayList<>();
-
-
     private final TETile[][] tiles;
-    private final int X = 0;
-    private final int Y = 0;
 
-
-    private class pair {
-        private int x;
-        private int y;
-
-        public pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return this.x;
-        }
-
-        public int getY() {
-            return this.y;
-        }
-    }
 
     public World(String seed, int width, int height) {
         Long s = Long.parseLong(seed);
@@ -65,24 +43,15 @@ public class World {
             }
         }
 
-<<<<<<< HEAD
         while (curHalls <= numHalls) {
             generateHall();
             curHalls++;
         }
 
-
-
-
-
-        /*while (curRooms <= numRooms) {
-            int startx = RANDOM.nextInt(3, w-5);
-            int starty = RANDOM.nextInt(3, h-5);
-=======
+       /*
         while (curRooms <= numRooms) {
             int startx = RANDOM.nextInt(3, w - 5);
             int starty = RANDOM.nextInt(3, h - 5);
->>>>>>> a4d4457a256b80af1f63ebfc1a16f7e6b323e77d
             pair start = new pair(startx, starty); // left bottom
 
             int endx = RANDOM.nextInt(startx + 2, w - 3);
@@ -103,6 +72,19 @@ public class World {
 
             curRooms++;
         }*/
+    }
+
+    public static void main(String[] args) {
+        // Change these parameters as necessary
+        int a = 50;
+        int b = 30;
+
+        World knightWorld = new World("1221", a, b);
+
+        TERenderer ter = new TERenderer();
+        ter.initialize(a, b);
+        ter.renderFrame(knightWorld.getTiles());
+
     }
 
     private void generateHall() {
@@ -299,7 +281,6 @@ public class World {
     }
 
 
-
     //check if randomly generated room overlaps with previous room in leftbottom and rightop
     public boolean overlap(pair start, pair end) {
         if (LeftBottom != null && RightTop != null) {
@@ -339,16 +320,21 @@ public class World {
         return tiles;
     }
 
-    public static void main(String[] args) {
-        // Change these parameters as necessary
-        int a = 50;
-        int b = 30;
+    private class pair {
+        private final int x;
+        private final int y;
 
-        World knightWorld = new World("1221", a, b);
+        public pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
 
-        TERenderer ter = new TERenderer();
-        ter.initialize(a, b);
-        ter.renderFrame(knightWorld.getTiles());
+        public int getX() {
+            return this.x;
+        }
 
+        public int getY() {
+            return this.y;
+        }
     }
 }
