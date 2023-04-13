@@ -27,6 +27,24 @@ public class World {
     private final int Y = 0;
 
 
+    private class pair {
+        private int x;
+        private int y;
+
+        public pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public int getX() {
+            return this.x;
+        }
+
+        public int getY() {
+            return this.y;
+        }
+    }
+
     public World(String seed, int width, int height) {
         Long s = Long.parseLong(seed);
         this.RANDOM = new Random(s);
@@ -77,19 +95,6 @@ public class World {
 
             curRooms++;
         }*/
-    }
-
-    public static void main(String[] args) {
-        // Change these parameters as necessary
-        int a = 50;
-        int b = 30;
-
-        World knightWorld = new World("1221", a, b);
-
-        TERenderer ter = new TERenderer();
-        ter.initialize(a, b);
-        ter.renderFrame(knightWorld.getTiles());
-
     }
 
     private void generateHall() {
@@ -286,25 +291,25 @@ public class World {
     }
 
 
+
     //check if randomly generated room overlaps with previous room in leftbottom and rightop
-    /*public boolean overlapRoom(pair start, pair end) {
-
-        for(int i = 0; i< LeftBottom.size(); i++){
-            pair l = LeftBottom.get(i);
-            pair r = RightTop.get(i);
-            int oldLength = Math.abs(l.y - r.y);
-            int oldWidth = Math.abs(l.x - r.x);
-
-            int length = end.y - start.y;
-            int width = end.x - start.x;
-
-            if(start.x + width < l.x + oldWidth){
-
+    public boolean overlap(pair start, pair end) {
+        if (LeftBottom != null && RightTop != null) {
+            //creates rectangle for randomly generated room
+            Rectangle r1 = new Rectangle(start.getX(), start.getY(), end.getX() - start.getX(), end.getY() - start.getY());
+            for (int i = 0; i < LeftBottom.size(); i++) {
+                pair l = LeftBottom.get(i);
+                pair r = RightTop.get(i);
+                int oldLength = Math.abs(l.y - r.y);
+                int oldWidth = Math.abs(l.x - r.x);
+                Rectangle r2 = new Rectangle(l.getX(), l.getY(), oldWidth, oldLength);
+                if (r2.intersects(r1)) {
+                    return true;
+                }
             }
-
         }
         return false;
-    }*/
+    }
 
     private void createRoom(pair start, pair end) {
         for (int i = start.getX()+1; i < end.getX(); i++) {
@@ -326,21 +331,16 @@ public class World {
         return tiles;
     }
 
-    private class pair {
-        private final int x;
-        private final int y;
+    public static void main(String[] args) {
+        // Change these parameters as necessary
+        int a = 50;
+        int b = 30;
 
-        public pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
+        World knightWorld = new World("1221", a, b);
 
-        public int getX() {
-            return this.x;
-        }
+        TERenderer ter = new TERenderer();
+        ter.initialize(a, b);
+        ter.renderFrame(knightWorld.getTiles());
 
-        public int getY() {
-            return this.y;
-        }
     }
 }
