@@ -12,17 +12,18 @@ public class World {
     private final ArrayList<pair> hallStart = new ArrayList<>();
     private final ArrayList<pair> hallEnd = new ArrayList<>();
     private final ArrayList<Integer> hallDirection = new ArrayList<>();
+
     private final ArrayList<pair> LeftBottom = new ArrayList<>();
     private final ArrayList<pair> RightTop = new ArrayList<>();
     private final ArrayList<pair> Center = new ArrayList<>();
-    private final int X = 0;
-    private final int Y = 0;
+
     /* Feel free to change the width and height. */
     public int w;
     public int h;
+
     TERenderer ter = new TERenderer();
-    private final Random RANDOM;
-    private final TETile[][] tiles;
+    private Random RANDOM;
+    private TETile[][] tiles;
 
 
     private class pair {
@@ -65,38 +66,79 @@ public class World {
             curHalls++;
         }
 
-        /*for (int i = 0; i < hallDirection.size(); i++) {
-            if (hallDirection.get(i)==0) {
-                generateRoom1(i);
-            } else {
-                generateRoom1(i);
+        for (int i = 0; i < hallDirection.size(); i++) {
+            generateRoom(i, true);
+        }
+
+        breakWalls();
+    }
+
+    private void breakWalls() {
+        for (int i = 0; i < w-2; i++) {
+            for (int j = 0; j < h-2; j++) {
+                if (tiles[i][j]==Tileset.FLOOR && tiles[i][j+1]==Tileset.WALL && tiles[i][j+2]==Tileset.FLOOR) {
+                    tiles[i][j+1]=Tileset.FLOOR;
+                }
+                if (tiles[i][j]==Tileset.FLOOR && tiles[i+1][j]==Tileset.WALL && tiles[i+2][j]==Tileset.FLOOR) {
+                    tiles[i+1][j]=Tileset.FLOOR;
+                }
             }
-        }*/
+        }
     }
 
     // generate Rooms on start and end of vertical hallways
-    private void generateRoom1(int index) {
-        int startx = RANDOM.nextInt(3, w - 5);
-        int starty = RANDOM.nextInt(3, h - 5);
-        pair start = new pair(startx, starty); // left bottom
+    private void generateRoom(int index) {
+        pair start = hallStart.get(index);
+        pair end = hallEnd.get(index);
 
-        int endx = RANDOM.nextInt(startx + 2, w - 3);
-        int endy = RANDOM.nextInt(starty + 2, h - 3);
-        pair end = new pair(endx, endy); //top right
-
-        int centerx = (startx + endx) / 2;
-        int centery = (starty + endy) / 2;
-        pair center = new pair(centerx, centery); //center
-
-        //check for overlap
-        if (!overlap(start, end)) {
-            createRoom(start, end);
-            LeftBottom.add(start);
-            RightTop.add(end);
-            Center.add(center);
+        int yes = RANDOM.nextInt(0, 2); // 0 = don't generate room, 1 = generate room
+        if (yes==1) {
+            helper(start);
         }
 
+        yes = RANDOM.nextInt(0, 2);
+        if (yes==1) {
+            helper(end);
+        }
     }
+
+    private void helper(pair original) {
+        int width = RANDOM.nextInt(1, 7);
+        int height = RANDOM.nextInt(1, 7);
+        int xchange = 0;
+        int ychange = 0;
+
+
+        int a1 = Math.min(w-3-original.getX(), original.getX()-3);
+        if (a1 == original.getX()-3) {
+            xchange = RANDOM.nextInt(0, Math.min(a1, width));
+        } else {
+            xchange = width - RANDOM.nextInt(0, Math.min(a1, width));
+        }
+
+        int a2 = Math.min(h-3-original.getY(), original.getY()-3);
+        if (a2 == original.getY()-3) {
+            ychange = RANDOM.nextInt(0, Math.min(a2, height));
+        } else {
+            ychange = height - RANDOM.nextInt(0, Math.min(a2, height));
+        }
+
+        int startx = original.getX() - xchange;
+        int starty = original.getY() - ychange;
+        pair roomStart = new pair(startx, starty); // left bottom
+
+        int endx = startx + width;
+        int endy = starty + height;
+        pair roomEnd = new pair(endx, endy); // top right
+
+        //check for overlap
+        if (!overlap(roomStart, roomEnd)) {
+            createRoom(roomStart, roomEnd);
+            LeftBottom.add(roomStart);
+            RightTop.add(roomEnd);
+        }
+    }
+
 
     private void createRoom(pair start, pair end) {
         for (int i = start.getX(); i <= end.getX(); i++) {
@@ -199,7 +241,7 @@ public class World {
             // create middle section of hallway
             for (int i = a; i < end.getY(); i++) {
                 if (tiles[x][i] == Tileset.WALL) {
-                    stop = RANDOM.nextInt(0, 5); //1 = stop
+                    stop = RANDOM.nextInt(0, 2); //1 = stop
                     if (tiles[x][i + 1] == Tileset.WALL) {
                         if (tiles[x - 1][i] == Tileset.NOTHING) {
                             tiles[x - 1][i] = Tileset.WALL;
@@ -256,7 +298,7 @@ public class World {
             // create middle section of hallway
             for (int i = a; i < end.getX(); i++) {
                 if (tiles[i][y] == Tileset.WALL) {
-                    stop = RANDOM.nextInt(0, 5); //1 = stop
+                    stop = RANDOM.nextInt(0, 2); //1 = stop
                     if (tiles[i + 1][y] == Tileset.WALL) {
                         if (tiles[i][y - 1] == Tileset.NOTHING) {
                             tiles[i][y - 1] = Tileset.WALL;
@@ -339,7 +381,7 @@ public class World {
     public static void main(String[] args) {
         // Change these parameters as necessary
         int a = 80;
-        int b = 50;
+        int b = 30;
 
         World knightWorld = new World("1111", a, b);
 
@@ -348,4 +390,174 @@ public class World {
         ter.renderFrame(knightWorld.getTiles());
         knightWorld.printDirection();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //past code
+
+//    private void createHall(pair start, pair end, int direction) {
+//        int stop = 0;
+//        int x = start.getX();
+//        int y = start.getY();
+//
+//        // Upward Hallways
+//        if (direction == 0) { // up --> same x
+//            int a = y + 1;
+//            // create start wall based on condition
+//            if (tiles[x][y] == Tileset.NOTHING) {
+//                tiles[x - 1][y] = Tileset.WALL;
+//                tiles[x][y] = Tileset.WALL;
+//                tiles[x + 1][y] = Tileset.WALL;
+//            } else if (tiles[x][y] == Tileset.WALL && tiles[x][y + 1] == Tileset.FLOOR) {
+//                tiles[x][y+2] = Tileset.FLOOR;
+//                a = a + 2;
+//            }
+//            // create middle section of hallway
+//            for (int i = a; i < end.getY(); i++) {
+//                if (tiles[x][i] == Tileset.WALL) {
+//                    stop = RANDOM.nextInt(0, 5); //1 = stop
+//                    if (tiles[x][i + 1] == Tileset.WALL) {
+//                        if (tiles[x - 1][i] == Tileset.NOTHING) {
+//                            tiles[x - 1][i] = Tileset.WALL;
+//                            tiles[x - 1][i + 1] = Tileset.WALL;
+//                            tiles[x - 1][i + 2] = Tileset.WALL;
+//                        } else if (tiles[x + 1][i] == Tileset.NOTHING) {
+//                            tiles[x + 1][i] = Tileset.WALL;
+//                            tiles[x + 1][i + 1] = Tileset.WALL;
+//                            tiles[x + 1][i + 2] = Tileset.WALL;
+//                        }
+//                        tiles[x][i] = Tileset.FLOOR;
+//                        tiles[x][i + 1] = Tileset.FLOOR;
+//                        if (stop == 1) {
+//                            break;
+//                        } else {
+//                            tiles[x][i + 2] = Tileset.FLOOR;
+//                            i = i + 2;
+//                        }
+//                    } else {
+//                        tiles[x][i] = Tileset.FLOOR;
+//                        if (stop == 1) {
+//                            break;
+//                        } else {
+//                            tiles[x][i + 2] = Tileset.FLOOR;
+//                            i = i + 2;
+//                        }
+//                    }
+//                } else {
+//                    tiles[x - 1][i] = Tileset.WALL;
+//                    tiles[x][i] = Tileset.FLOOR;
+//                    tiles[x + 1][i] = Tileset.WALL;
+//                }
+//            }
+//            // if did not stop during the middle, create an end wall
+//            if (stop != 1) {
+//                tiles[x - 1][end.getY()] = Tileset.WALL;
+//                tiles[x][end.getY()] = Tileset.WALL;
+//                tiles[x + 1][end.getY()] = Tileset.WALL;
+//            }
+//        }
+//
+//        // Rightward Hallways
+//        else if (direction == 2) { // right --> same y
+//            int a = x + 1;
+//            // create start wall based on condition
+//            if (tiles[x][y] == Tileset.NOTHING) {
+//                tiles[x][y - 1] = Tileset.WALL;
+//                tiles[x][y] = Tileset.WALL;
+//                tiles[x][y + 1] = Tileset.WALL;
+//            } else if (tiles[x][y] == Tileset.WALL && tiles[x + 1][y] == Tileset.FLOOR) {
+//                tiles[x+2][y] = Tileset.FLOOR;
+//                a = a + 2;
+//            }
+//            // create middle section of hallway
+//            for (int i = a; i < end.getX(); i++) {
+//                if (tiles[i][y] == Tileset.WALL) {
+//                    stop = RANDOM.nextInt(0, 5); //1 = stop
+//                    if (tiles[i + 1][y] == Tileset.WALL) {
+//                        if (tiles[i][y - 1] == Tileset.NOTHING) {
+//                            tiles[i][y - 1] = Tileset.WALL;
+//                            tiles[i + 1][y - 1] = Tileset.WALL;
+//                            tiles[i + 2][y - 1] = Tileset.WALL;
+//                        } else if (tiles[i][y + 1] == Tileset.NOTHING) {
+//                            tiles[i][y + 1] = Tileset.WALL;
+//                            tiles[i + 1][y + 1] = Tileset.WALL;
+//                            tiles[i + 2][y + 1] = Tileset.WALL;
+//                        }
+//                        tiles[i][y] = Tileset.FLOOR;
+//                        tiles[i + 1][y] = Tileset.FLOOR;
+//                        if (stop == 1) {
+//                            break;
+//                        } else {
+//                            tiles[i + 2][y] = Tileset.FLOOR;
+//                            i = i + 2;
+//                        }
+//                    } else {
+//                        tiles[i][y] = Tileset.FLOOR;
+//                        if (stop == 1) {
+//                            break;
+//                        } else {
+//                            tiles[i + 2][y] = Tileset.FLOOR;
+//                            i = i + 2;
+//                        }
+//                    }
+//                } else {
+//                    tiles[i][y - 1] = Tileset.WALL;
+//                    tiles[i][y] = Tileset.FLOOR;
+//                    tiles[i][y + 1] = Tileset.WALL;
+//                }
+//            }
+//            // if did not stop during the middle, create an end wall
+//            if (stop != 1) {
+//                tiles[end.getX()][y - 1] = Tileset.WALL;
+//                tiles[end.getX()][y] = Tileset.WALL;
+//                tiles[end.getX()][y + 1] = Tileset.WALL;
+//            }
+//        }
+//        // add parameters into ArrayLists
+//        hallStart.add(start);
+//        hallEnd.add(end);
+//        hallDirection.add(direction);
+//    }
+
+
+
+
+
+
+    // generate Rooms on start and end of vertical hallways
+//    private void generateRoom1(int index) {
+//        int startx = RANDOM.nextInt(3, w - 5);
+//        int starty = RANDOM.nextInt(3, h - 5);
+//        pair start = new pair(startx, starty); // left bottom
+//
+//        int endx = RANDOM.nextInt(startx + 2, w - 3);
+//        int endy = RANDOM.nextInt(starty + 2, h - 3);
+//        pair end = new pair(endx, endy); //top right
+//
+//        int centerx = (startx + endx) / 2;
+//        int centery = (starty + endy) / 2;
+//        pair center = new pair(centerx, centery); //center
+//
+//        //check for overlap
+//        if (!overlap(roomStart, roomEnd)) {
+//            createRoom(roomStart, roomEnd);
+//            LeftBottom.add(roomStart);
+//            RightTop.add(roomEnd);
+//        }
+//
+//    }
 }
