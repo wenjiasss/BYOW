@@ -22,27 +22,8 @@ public class World {
     public int h;
 
     TERenderer ter = new TERenderer();
-    private Random RANDOM;
-    private TETile[][] tiles;
-
-
-    private class pair {
-        private final int x;
-        private final int y;
-
-        public pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return this.x;
-        }
-
-        public int getY() {
-            return this.y;
-        }
-    }
+    private final Random RANDOM;
+    private final TETile[][] tiles;
 
 
     public World(String seed, int width, int height) {
@@ -67,20 +48,33 @@ public class World {
         }
 
         for (int i = 0; i < hallDirection.size(); i++) {
-            generateRoom(i, true);
+            generateRoom(i);
         }
 
         breakWalls();
     }
 
+    public static void main(String[] args) {
+        // Change these parameters as necessary
+        int a = 80;
+        int b = 30;
+
+        World knightWorld = new World("1111", a, b);
+
+        TERenderer ter = new TERenderer();
+        ter.initialize(a, b);
+        ter.renderFrame(knightWorld.getTiles());
+        knightWorld.printDirection();
+    }
+
     private void breakWalls() {
-        for (int i = 0; i < w-2; i++) {
-            for (int j = 0; j < h-2; j++) {
-                if (tiles[i][j]==Tileset.FLOOR && tiles[i][j+1]==Tileset.WALL && tiles[i][j+2]==Tileset.FLOOR) {
-                    tiles[i][j+1]=Tileset.FLOOR;
+        for (int i = 0; i < w - 2; i++) {
+            for (int j = 0; j < h - 2; j++) {
+                if (tiles[i][j] == Tileset.FLOOR && tiles[i][j + 1] == Tileset.WALL && tiles[i][j + 2] == Tileset.FLOOR) {
+                    tiles[i][j + 1] = Tileset.FLOOR;
                 }
-                if (tiles[i][j]==Tileset.FLOOR && tiles[i+1][j]==Tileset.WALL && tiles[i+2][j]==Tileset.FLOOR) {
-                    tiles[i+1][j]=Tileset.FLOOR;
+                if (tiles[i][j] == Tileset.FLOOR && tiles[i + 1][j] == Tileset.WALL && tiles[i + 2][j] == Tileset.FLOOR) {
+                    tiles[i + 1][j] = Tileset.FLOOR;
                 }
             }
         }
@@ -92,12 +86,12 @@ public class World {
         pair end = hallEnd.get(index);
 
         int yes = RANDOM.nextInt(0, 2); // 0 = don't generate room, 1 = generate room
-        if (yes==1) {
+        if (yes == 1) {
             helper(start);
         }
 
         yes = RANDOM.nextInt(0, 2);
-        if (yes==1) {
+        if (yes == 1) {
             helper(end);
         }
     }
@@ -109,15 +103,15 @@ public class World {
         int ychange = 0;
 
 
-        int a1 = Math.min(w-3-original.getX(), original.getX()-3);
-        if (a1 == original.getX()-3) {
+        int a1 = Math.min(w - 3 - original.getX(), original.getX() - 3);
+        if (a1 == original.getX() - 3) {
             xchange = RANDOM.nextInt(0, Math.min(a1, width));
         } else {
             xchange = width - RANDOM.nextInt(0, Math.min(a1, width));
         }
 
-        int a2 = Math.min(h-3-original.getY(), original.getY()-3);
-        if (a2 == original.getY()-3) {
+        int a2 = Math.min(h - 3 - original.getY(), original.getY() - 3);
+        if (a2 == original.getY() - 3) {
             ychange = RANDOM.nextInt(0, Math.min(a2, height));
         } else {
             ychange = height - RANDOM.nextInt(0, Math.min(a2, height));
@@ -146,13 +140,13 @@ public class World {
                 tiles[i][j] = Tileset.FLOOR;
             }
         }
-        for (int i = start.getX()-1; i <= end.getX()+1; i++) {
-            tiles[i][start.getY()-1] = Tileset.WALL;
-            tiles[i][end.getY()+1] = Tileset.WALL;
+        for (int i = start.getX() - 1; i <= end.getX() + 1; i++) {
+            tiles[i][start.getY() - 1] = Tileset.WALL;
+            tiles[i][end.getY() + 1] = Tileset.WALL;
         }
-        for (int j = start.getY()-1; j <= end.getY()+1; j++) {
-            tiles[start.getX()-1][j] = Tileset.WALL;
-            tiles[end.getX()+1][j] = Tileset.WALL;
+        for (int j = start.getY() - 1; j <= end.getY() + 1; j++) {
+            tiles[start.getX() - 1][j] = Tileset.WALL;
+            tiles[end.getX() + 1][j] = Tileset.WALL;
         }
     }
 
@@ -235,7 +229,7 @@ public class World {
                 tiles[x][y] = Tileset.WALL;
                 tiles[x + 1][y] = Tileset.WALL;
             } else if (tiles[x][y] == Tileset.WALL && tiles[x][y + 1] == Tileset.FLOOR) {
-                tiles[x][y+2] = Tileset.FLOOR;
+                tiles[x][y + 2] = Tileset.FLOOR;
                 a = a + 2;
             }
             // create middle section of hallway
@@ -292,7 +286,7 @@ public class World {
                 tiles[x][y] = Tileset.WALL;
                 tiles[x][y + 1] = Tileset.WALL;
             } else if (tiles[x][y] == Tileset.WALL && tiles[x + 1][y] == Tileset.FLOOR) {
-                tiles[x+2][y] = Tileset.FLOOR;
+                tiles[x + 2][y] = Tileset.FLOOR;
                 a = a + 2;
             }
             // create middle section of hallway
@@ -378,33 +372,23 @@ public class World {
         System.out.println(hallDirection);
     }
 
-    public static void main(String[] args) {
-        // Change these parameters as necessary
-        int a = 80;
-        int b = 30;
+    private class pair {
+        private final int x;
+        private final int y;
 
-        World knightWorld = new World("1111", a, b);
+        public pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
 
-        TERenderer ter = new TERenderer();
-        ter.initialize(a, b);
-        ter.renderFrame(knightWorld.getTiles());
-        knightWorld.printDirection();
+        public int getX() {
+            return this.x;
+        }
+
+        public int getY() {
+            return this.y;
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //past code
@@ -532,10 +516,6 @@ public class World {
 //        hallEnd.add(end);
 //        hallDirection.add(direction);
 //    }
-
-
-
-
 
 
     // generate Rooms on start and end of vertical hallways
