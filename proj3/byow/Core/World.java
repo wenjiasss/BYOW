@@ -15,7 +15,6 @@ public class World {
 
     private final ArrayList<pair> LeftBottom = new ArrayList<>();
     private final ArrayList<pair> RightTop = new ArrayList<>();
-    private final ArrayList<pair> Center = new ArrayList<>();
 
     /* Feel free to change the width and height. */
     public int w;
@@ -27,7 +26,7 @@ public class World {
 
 
     public World(String seed, int width, int height) {
-        Long s = Long.parseLong(seed);
+        long s = Long.parseLong(seed);
         this.RANDOM = new Random(s);
         this.w = width;
         this.h = height;
@@ -99,26 +98,26 @@ public class World {
     private void helper(pair original) {
         int width = RANDOM.nextInt(1, 7);
         int height = RANDOM.nextInt(1, 7);
-        int xchange = 0;
-        int ychange = 0;
+        int xchange;
+        int ychange;
 
 
-        int a1 = Math.min(w - 3 - original.getX(), original.getX() - 3);
-        if (a1 == original.getX() - 3) {
+        int a1 = Math.min(w - 3 - original.x(), original.x() - 3);
+        if (a1 == original.x() - 3) {
             xchange = RANDOM.nextInt(0, Math.min(a1, width));
         } else {
             xchange = width - RANDOM.nextInt(0, Math.min(a1, width));
         }
 
-        int a2 = Math.min(h - 3 - original.getY(), original.getY() - 3);
-        if (a2 == original.getY() - 3) {
+        int a2 = Math.min(h - 3 - original.y(), original.y() - 3);
+        if (a2 == original.y() - 3) {
             ychange = RANDOM.nextInt(0, Math.min(a2, height));
         } else {
             ychange = height - RANDOM.nextInt(0, Math.min(a2, height));
         }
 
-        int startx = original.getX() - xchange;
-        int starty = original.getY() - ychange;
+        int startx = original.x() - xchange;
+        int starty = original.y() - ychange;
         pair roomStart = new pair(startx, starty); // left bottom
 
         int endx = startx + width;
@@ -135,18 +134,18 @@ public class World {
 
 
     private void createRoom(pair start, pair end) {
-        for (int i = start.getX(); i <= end.getX(); i++) {
-            for (int j = start.getY(); j <= end.getY(); j++) {
+        for (int i = start.x(); i <= end.x(); i++) {
+            for (int j = start.y(); j <= end.y(); j++) {
                 tiles[i][j] = Tileset.FLOOR;
             }
         }
-        for (int i = start.getX() - 1; i <= end.getX() + 1; i++) {
-            tiles[i][start.getY() - 1] = Tileset.WALL;
-            tiles[i][end.getY() + 1] = Tileset.WALL;
+        for (int i = start.x() - 1; i <= end.x() + 1; i++) {
+            tiles[i][start.y() - 1] = Tileset.WALL;
+            tiles[i][end.y() + 1] = Tileset.WALL;
         }
-        for (int j = start.getY() - 1; j <= end.getY() + 1; j++) {
-            tiles[start.getX() - 1][j] = Tileset.WALL;
-            tiles[end.getX() + 1][j] = Tileset.WALL;
+        for (int j = start.y() - 1; j <= end.y() + 1; j++) {
+            tiles[start.x() - 1][j] = Tileset.WALL;
+            tiles[end.x() + 1][j] = Tileset.WALL;
         }
     }
 
@@ -154,13 +153,13 @@ public class World {
     public boolean overlap(pair start, pair end) {
         if (LeftBottom != null && RightTop != null) {
             //creates rectangle for randomly generated room
-            Rectangle r1 = new Rectangle(start.getX(), start.getY(), end.getX() - start.getX(), end.getY() - start.getY());
+            Rectangle r1 = new Rectangle(start.x(), start.y(), end.x() - start.x(), end.y() - start.y());
             for (int i = 0; i < LeftBottom.size(); i++) {
                 pair l = LeftBottom.get(i);
                 pair r = RightTop.get(i);
                 int oldLength = Math.abs(l.y - r.y);
                 int oldWidth = Math.abs(l.x - r.x);
-                Rectangle r2 = new Rectangle(l.getX(), l.getY(), oldWidth, oldLength);
+                Rectangle r2 = new Rectangle(l.x(), l.y(), oldWidth, oldLength);
                 if (r2.intersects(r1)) {
                     return true;
                 }
@@ -189,7 +188,7 @@ public class World {
                 endy = 5;
                 direction = 1;
             }
-        } else if (direction >= 2) {
+        } else {
             int lenRight = w - 5 - startx;
             int lenLeft = startx - 5;
             if (lenRight >= lenLeft) {
@@ -217,8 +216,8 @@ public class World {
     // create the hallway on tiles
     private void createHall(pair start, pair end, int direction) {
         int stop = 0;
-        int x = start.getX();
-        int y = start.getY();
+        int x = start.x();
+        int y = start.y();
 
         // Upward Hallways
         if (direction == 0) { // up --> same x
@@ -233,7 +232,7 @@ public class World {
                 a = a + 2;
             }
             // create middle section of hallway
-            for (int i = a; i < end.getY(); i++) {
+            for (int i = a; i < end.y(); i++) {
                 if (tiles[x][i] == Tileset.WALL) {
                     stop = RANDOM.nextInt(0, 2); //1 = stop
                     if (tiles[x][i + 1] == Tileset.WALL) {
@@ -248,20 +247,14 @@ public class World {
                         }
                         tiles[x][i] = Tileset.FLOOR;
                         tiles[x][i + 1] = Tileset.FLOOR;
-                        if (stop == 1) {
-                            break;
-                        } else {
-                            tiles[x][i + 2] = Tileset.FLOOR;
-                            i = i + 2;
-                        }
                     } else {
                         tiles[x][i] = Tileset.FLOOR;
-                        if (stop == 1) {
-                            break;
-                        } else {
-                            tiles[x][i + 2] = Tileset.FLOOR;
-                            i = i + 2;
-                        }
+                    }
+                    if (stop == 1) {
+                        break;
+                    } else {
+                        tiles[x][i + 2] = Tileset.FLOOR;
+                        i = i + 2;
                     }
                 } else {
                     tiles[x - 1][i] = Tileset.WALL;
@@ -271,9 +264,9 @@ public class World {
             }
             // if did not stop during the middle, create an end wall
             if (stop != 1) {
-                tiles[x - 1][end.getY()] = Tileset.WALL;
-                tiles[x][end.getY()] = Tileset.WALL;
-                tiles[x + 1][end.getY()] = Tileset.WALL;
+                tiles[x - 1][end.y()] = Tileset.WALL;
+                tiles[x][end.y()] = Tileset.WALL;
+                tiles[x + 1][end.y()] = Tileset.WALL;
             }
         }
 
@@ -290,7 +283,7 @@ public class World {
                 a = a + 2;
             }
             // create middle section of hallway
-            for (int i = a; i < end.getX(); i++) {
+            for (int i = a; i < end.x(); i++) {
                 if (tiles[i][y] == Tileset.WALL) {
                     stop = RANDOM.nextInt(0, 2); //1 = stop
                     if (tiles[i + 1][y] == Tileset.WALL) {
@@ -305,20 +298,14 @@ public class World {
                         }
                         tiles[i][y] = Tileset.FLOOR;
                         tiles[i + 1][y] = Tileset.FLOOR;
-                        if (stop == 1) {
-                            break;
-                        } else {
-                            tiles[i + 2][y] = Tileset.FLOOR;
-                            i = i + 2;
-                        }
                     } else {
                         tiles[i][y] = Tileset.FLOOR;
-                        if (stop == 1) {
-                            break;
-                        } else {
-                            tiles[i + 2][y] = Tileset.FLOOR;
-                            i = i + 2;
-                        }
+                    }
+                    if (stop == 1) {
+                        break;
+                    } else {
+                        tiles[i + 2][y] = Tileset.FLOOR;
+                        i = i + 2;
                     }
                 } else {
                     tiles[i][y - 1] = Tileset.WALL;
@@ -328,9 +315,9 @@ public class World {
             }
             // if did not stop during the middle, create an end wall
             if (stop != 1) {
-                tiles[end.getX()][y - 1] = Tileset.WALL;
-                tiles[end.getX()][y] = Tileset.WALL;
-                tiles[end.getX()][y + 1] = Tileset.WALL;
+                tiles[end.x()][y - 1] = Tileset.WALL;
+                tiles[end.x()][y] = Tileset.WALL;
+                tiles[end.x()][y + 1] = Tileset.WALL;
             }
         }
         // add parameters into ArrayLists
@@ -345,17 +332,17 @@ public class World {
         if (direction <= 1) { // check x
             for (int i = 0; i < hallDirection.size(); i++) {
                 if (hallDirection.get(i) <= 1) {
-                    int p = hallStart.get(i).getX();
-                    if (p - 3 <= start.getX() && start.getX() <= p + 3) {
+                    int p = hallStart.get(i).x();
+                    if (p - 3 <= start.x() && start.x() <= p + 3) {
                         result = false;
                     }
                 }
             }
-        } else if (direction >= 2) { // check y
+        } else { // check y
             for (int i = 0; i < hallDirection.size(); i++) {
                 if (hallDirection.get(i) >= 2) {
-                    int p = hallStart.get(i).getY();
-                    if (p - 3 <= start.getY() && start.getY() <= p + 3) {
+                    int p = hallStart.get(i).y();
+                    if (p - 3 <= start.y() && start.y() <= p + 3) {
                         result = false;
                     }
                 }
@@ -372,22 +359,7 @@ public class World {
         System.out.println(hallDirection);
     }
 
-    private class pair {
-        private final int x;
-        private final int y;
-
-        public pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return this.x;
-        }
-
-        public int getY() {
-            return this.y;
-        }
+    private record pair(int x, int y) {
     }
 
 
