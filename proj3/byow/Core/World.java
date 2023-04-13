@@ -4,6 +4,7 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.awt.*;
 import java.util.*;
 import java.util.Random;
 
@@ -29,13 +30,16 @@ public class World {
     private class pair {
         private int x;
         private int y;
-        public pair(int x, int y){
+
+        public pair(int x, int y) {
             this.x = x;
             this.y = y;
         }
+
         public int getX() {
             return this.x;
         }
+
         public int getY() {
             return this.y;
         }
@@ -60,12 +64,12 @@ public class World {
         }
 
         while (curRooms <= numRooms) {
-            int startx = RANDOM.nextInt(3, w-5);
-            int starty = RANDOM.nextInt(3, h-5);
+            int startx = RANDOM.nextInt(3, w - 5);
+            int starty = RANDOM.nextInt(3, h - 5);
             pair start = new pair(startx, starty); // left bottom
 
-            int endx = RANDOM.nextInt(startx+2, w-3);
-            int endy = RANDOM.nextInt(starty+2, h-3);
+            int endx = RANDOM.nextInt(startx + 2, w - 3);
+            int endy = RANDOM.nextInt(starty + 2, h - 3);
             pair end = new pair(endx, endy); //top right
 
             //check for overlap
@@ -80,8 +84,8 @@ public class World {
     }
 
     private void createRoom(pair start, pair end) {
-        for (int i = start.getX()+1; i < end.getX(); i++) {
-            for (int j = start.getY()+1; j < end.getY(); j++) {
+        for (int i = start.getX() + 1; i < end.getX(); i++) {
+            for (int j = start.getY() + 1; j < end.getY(); j++) {
                 tiles[i][j] = Tileset.FLOOR;
             }
         }
@@ -98,25 +102,24 @@ public class World {
 
     //check if randomly generated room overlaps with previous room in leftbottom and rightop
     public boolean overlap(pair start, pair end) {
-
-        for(int i = 0; i< LeftBottom.size(); i++){
-            pair l = LeftBottom.get(i);
-            pair r = RightTop.get(i);
-            int oldLength = Math.abs(l.y - r.y);
-            int oldWidth = Math.abs(l.x - r.x);
-
-            int length = end.y - start.y;
-            int width = end.x - start.x;
-
-            if(start.x + width < l.x + oldWidth){
-
+        if (LeftBottom != null && RightTop != null) {
+            //creates rectangle for randomly generated room
+            Rectangle r1 = new Rectangle(start.getX(), start.getY(), end.getX() - start.getX(), end.getY() - start.getY());
+            for (int i = 0; i < LeftBottom.size(); i++) {
+                pair l = LeftBottom.get(i);
+                pair r = RightTop.get(i);
+                int oldLength = Math.abs(l.y - r.y);
+                int oldWidth = Math.abs(l.x - r.x);
+                Rectangle r2 = new Rectangle(l.getX(), l.getY(), oldWidth, oldLength);
+                if (r2.intersects(r1)) {
+                    return true;
+                }
             }
-
         }
         return false;
     }
 
-    public void connectRoom(){
+    public void connectRoom() {
 
     }
 
