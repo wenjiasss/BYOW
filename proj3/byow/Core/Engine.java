@@ -2,15 +2,10 @@ package byow.Core;
 
 import java.util.Random;
 
-import byow.Core.RandomUtils;
 import byow.InputDemo.InputSource;
-import byow.InputDemo.KeyboardInputSource;
 import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
-import byow.TileEngine.Tileset;
-
-import java.util.*;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -90,14 +85,13 @@ public class Engine {
         return tiles;
     }
 
-
-    public static void main(String[] args) {
-        Engine engine = new Engine();
-        TETile[][] t = engine.interactWithInputString("N87536S");
-        TERenderer ter = new TERenderer();
-        ter.initialize(80, 40);
-        ter.renderFrame(t);
-    }
-
+//
+//    public static void main(String[] args) {
+//        Engine engine = new Engine();
+//        TETile[][] t = engine.interactWithInputString("N87536S");
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(80, 40);
+//        ter.renderFrame(t);
+//    }
 
 }
