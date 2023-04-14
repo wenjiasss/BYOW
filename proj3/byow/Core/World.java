@@ -11,7 +11,7 @@ import java.util.Random;
 public class World {
     private final ArrayList<pair> hallStart = new ArrayList<>();
     private final ArrayList<pair> hallEnd = new ArrayList<>();
-    private final ArrayList<Integer> hallDirection = new ArrayList<>();
+    private final ArrayList<Integer> hallDirection = new ArrayList<>(); //0 = up, 2 = right
 
     private final ArrayList<pair> LeftBottom = new ArrayList<>();
     private final ArrayList<pair> RightTop = new ArrayList<>();
@@ -31,7 +31,7 @@ public class World {
         this.w = width;
         this.h = height;
 
-        int numHalls = RANDOM.nextInt(20, 30);
+        int numHalls = RANDOM.nextInt(40, 50);
         int curHalls = 0;
 
         tiles = new TETile[w][h];
@@ -72,11 +72,34 @@ public class World {
                 if (tiles[i][j] == Tileset.FLOOR && tiles[i][j + 1] == Tileset.WALL && tiles[i][j + 2] == Tileset.FLOOR) {
                     tiles[i][j + 1] = Tileset.FLOOR;
                 }
+                if (tiles[i][j] == Tileset.FLOOR && tiles[i][j + 1] == Tileset.WALL && tiles[i][j + 2] == Tileset.WALL && tiles[i][j + 3] == Tileset.FLOOR) {
+                    tiles[i][j + 1] = Tileset.FLOOR;
+                    tiles[i][j + 2] = Tileset.FLOOR;
+                }
                 if (tiles[i][j] == Tileset.FLOOR && tiles[i + 1][j] == Tileset.WALL && tiles[i + 2][j] == Tileset.FLOOR) {
                     tiles[i + 1][j] = Tileset.FLOOR;
                 }
+                if (tiles[i][j] == Tileset.FLOOR && tiles[i + 1][j] == Tileset.WALL && tiles[i + 2][j] == Tileset.WALL && tiles[i + 3][j] == Tileset.FLOOR) {
+                    tiles[i + 1][j] = Tileset.FLOOR;
+                    tiles[i + 2][j] = Tileset.FLOOR;
+                }
             }
         }
+    }
+
+    private boolean helper2(int i, int j, int a, int b) {
+        boolean result = false;
+        if (i == w || j == h) {
+            return result;
+        } else {
+            if (tiles[i][j]==Tileset.FLOOR) {
+                return true;
+            } else if (tiles[i][j]==Tileset.WALL) {
+                tiles[i][j] = Tileset.FLOOR;
+                return helper2(i+a, j+b, a, b);
+            }
+        }
+        return result;
     }
 
     // generate Rooms on start and end of vertical hallways
@@ -133,6 +156,7 @@ public class World {
     }
 
 
+    //draws it on the tiles
     private void createRoom(pair start, pair end) {
         for (int i = start.x(); i <= end.x(); i++) {
             for (int j = start.y(); j <= end.y(); j++) {
@@ -159,7 +183,7 @@ public class World {
                 pair r = RightTop.get(i);
                 int oldLength = Math.abs(l.y - r.y);
                 int oldWidth = Math.abs(l.x - r.x);
-                Rectangle r2 = new Rectangle(l.x(), l.y(), oldWidth, oldLength);
+                Rectangle r2 = new Rectangle(l.x()-1, l.y()-1, oldWidth+1, oldLength+1);
                 if (r2.intersects(r1)) {
                     return true;
                 }
