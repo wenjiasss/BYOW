@@ -83,23 +83,10 @@ public class World {
                     tiles[i + 1][j] = Tileset.FLOOR;
                     tiles[i + 2][j] = Tileset.FLOOR;
                 }
-            }
-        }
-    }
 
-    private boolean helper2(int i, int j, int a, int b) {
-        boolean result = false;
-        if (i == w || j == h) {
-            return result;
-        } else {
-            if (tiles[i][j]==Tileset.FLOOR) {
-                return true;
-            } else if (tiles[i][j]==Tileset.WALL) {
-                tiles[i][j] = Tileset.FLOOR;
-                return helper2(i+a, j+b, a, b);
+
             }
         }
-        return result;
     }
 
     // generate Rooms on start and end of vertical hallways
