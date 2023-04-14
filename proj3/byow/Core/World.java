@@ -12,6 +12,7 @@ public class World {
     private final ArrayList<pair> hallStart = new ArrayList<>();
     private final ArrayList<pair> hallEnd = new ArrayList<>();
     private final ArrayList<Integer> hallDirection = new ArrayList<>(); //0 = up, 2 = right
+    private final int stopChance = 3;
 
     private final ArrayList<pair> LeftBottom = new ArrayList<>();
     private final ArrayList<pair> RightTop = new ArrayList<>();
@@ -24,12 +25,12 @@ public class World {
 
 
     public World(String seed, int width, int height) {
-        long s = Long.parseLong(seed);
+        Long s = Long.parseLong(seed);
         this.RANDOM = new Random(s);
         this.w = width;
         this.h = height;
 
-        int numHalls = RANDOM.nextInt(20, 30);
+        int numHalls = RANDOM.nextInt(30, 50);
         int curHalls = 0;
 
         tiles = new TETile[w][h];
@@ -50,18 +51,6 @@ public class World {
 
         breakWalls();
         breakWalls();
-    }
-
-    public static void main(String[] args) {
-        // Change these parameters as necessary
-        int a = 80;
-        int b = 30;
-
-        World knightWorld = new World("1111", a, b);
-
-        TERenderer ter = new TERenderer();
-        ter.initialize(a, b);
-        ter.renderFrame(knightWorld.getTiles());
     }
 
     private void breakWalls() {
@@ -334,7 +323,7 @@ public class World {
             // create middle section of hallway
             for (int i = a; i < end.y(); i++) {
                 if (tiles[x][i] == Tileset.WALL) {
-                    stop = RANDOM.nextInt(0, 2); //1 = stop
+                    stop = RANDOM.nextInt(0, stopChance); //1 = stop
                     if (tiles[x][i + 1] == Tileset.WALL) {
                         if (tiles[x - 1][i] == Tileset.NOTHING) {
                             tiles[x - 1][i] = Tileset.WALL;
@@ -386,7 +375,7 @@ public class World {
             // create middle section of hallway
             for (int i = a; i < end.x(); i++) {
                 if (tiles[i][y] == Tileset.WALL) {
-                    stop = RANDOM.nextInt(0, 2); //1 = stop
+                    stop = RANDOM.nextInt(0, stopChance); //1 = stop
                     if (tiles[i + 1][y] == Tileset.WALL) {
                         if (tiles[i][y - 1] == Tileset.NOTHING) {
                             tiles[i][y - 1] = Tileset.WALL;

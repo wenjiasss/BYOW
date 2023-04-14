@@ -22,6 +22,9 @@ public class Engine {
     private TETile[][] tiles;
     private World world;
 
+    public Engine() {
+        tiles = new TETile[WIDTH][HEIGHT];
+    }
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -31,6 +34,7 @@ public class Engine {
      * q = quit game
      */
     public void interactWithKeyboard() {
+
 
     }
 
@@ -64,28 +68,35 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
-        TETile[][] finalWorldFrame = null;
         input = input.toLowerCase();
-        char first = input.charAt(0);
-        if (first == 'n') {
-            finalWorldFrame = newGame(input);
-        } else if (first == 'l') {
-            finalWorldFrame = loadGame(input);
-        } else if (first == 'q') {
-
+        InputSource inputSource = new StringInputDevice(input);
+        String seeds = "";
+        while (inputSource.possibleNextInput()) {
+            char c = inputSource.getNextKey();
+            if (c == 'n') {
+                seeds = "";
+            } else if (c == 's') {
+                break;
+            } else {
+                seeds = seeds + c;
+            }
         }
-        return finalWorldFrame;
+        World w = new World(seeds, WIDTH, HEIGHT);
+        return w.getTiles();
     }
 
-    public TETile[][] newGame(String input) {
-        SEED = Long.parseLong(input.substring(1));
-        World w = new World(Long.toString(SEED), WIDTH, HEIGHT);
-        TETile[][] finalWorldFrame = w.getTiles();
-        return finalWorldFrame;
-    }
 
     public TETile[][] loadGame(String input) {
-        return new TETile[0][];
+        return tiles;
+    }
+
+
+    public static void main(String[] args) {
+        Engine engine = new Engine();
+        TETile[][] t = engine.interactWithInputString("N87536S");
+        TERenderer ter = new TERenderer();
+        ter.initialize(80, 40);
+        ter.renderFrame(t);
     }
 
 
