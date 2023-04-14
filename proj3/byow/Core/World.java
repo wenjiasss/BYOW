@@ -31,7 +31,7 @@ public class World {
         this.w = width;
         this.h = height;
 
-        int numHalls = RANDOM.nextInt(40, 50);
+        int numHalls = RANDOM.nextInt(20, 30);
         int curHalls = 0;
 
         tiles = new TETile[w][h];
@@ -51,6 +51,8 @@ public class World {
         }
 
         breakWalls();
+        breakWalls();
+        breakWalls2();
     }
 
     public static void main(String[] args) {
@@ -63,7 +65,6 @@ public class World {
         TERenderer ter = new TERenderer();
         ter.initialize(a, b);
         ter.renderFrame(knightWorld.getTiles());
-        knightWorld.printDirection();
     }
 
     private void breakWalls() {
@@ -83,10 +84,67 @@ public class World {
                     tiles[i + 1][j] = Tileset.FLOOR;
                     tiles[i + 2][j] = Tileset.FLOOR;
                 }
-
-
             }
         }
+    }
+
+    private void breakWalls2() {
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                if (tiles[i][j] == Tileset.FLOOR) {
+                    pair p1 = helper2(i, j+2, 0, 1);
+                    pair p2 = helper2(i+2, j, 1, 0);
+                    if (tiles[i][j+1] == Tileset.WALL && p1!=null && helper3(i, j+1, p1, true)) {
+                        for (int k = j+1; k < p1.y(); k++) {
+                            tiles[i][k] = Tileset.FLOOR;
+                        }
+                    } else if (tiles[i+1][j] == Tileset.WALL && p2!=null && helper3(i+1, j, p2, false)) {
+                        for (int k = i+1; k < p2.x(); k++) {
+                            tiles[k][j] = Tileset.FLOOR;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private pair helper2(int i, int j, int a, int b) {
+        if (i==w || j==h) {
+            return null;
+        } else {
+            if (tiles[i][j] == Tileset.WALL) {
+                return helper2(i+a, j+b, a, b);
+            } else if (tiles[i][j]==Tileset.FLOOR) {
+                return new pair(i, j);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private boolean helper3(int i, int j, pair p, boolean vertical) {
+        boolean small=true;
+        boolean big=true;
+        if (vertical) {
+            for (int g = j; g < p.y(); g++) {
+                if (tiles[i-1][g] != Tileset.WALL) {
+                    small = false;
+                }
+                if (tiles[i+1][g] != Tileset.WALL) {
+                    big = false;
+                }
+            }
+        } else {
+            for (int g = i; g < p.x(); g++) {
+                if (tiles[g][j-1] != Tileset.WALL) {
+                    small = false;
+                }
+                if (tiles[g][j+1] != Tileset.WALL) {
+                    big = false;
+                }
+            }
+        }
+        return (small || big);
     }
 
     // generate Rooms on start and end of vertical hallways
@@ -262,6 +320,7 @@ public class World {
                         tiles[x][i] = Tileset.FLOOR;
                     }
                     if (stop == 1) {
+                        end = new pair(x, i+2);
                         break;
                     } else {
                         tiles[x][i + 2] = Tileset.FLOOR;
@@ -313,6 +372,7 @@ public class World {
                         tiles[i][y] = Tileset.FLOOR;
                     }
                     if (stop == 1) {
+                        end = new pair(i+2, y);
                         break;
                     } else {
                         tiles[i + 2][y] = Tileset.FLOOR;
@@ -364,10 +424,6 @@ public class World {
 
     public TETile[][] getTiles() {
         return tiles;
-    }
-
-    public void printDirection() {
-        System.out.println(hallDirection);
     }
 
     private record pair(int x, int y) {
