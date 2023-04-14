@@ -1,6 +1,7 @@
 package byow.Core;
 
 import java.util.Random;
+
 import byow.Core.RandomUtils;
 import byow.InputDemo.InputSource;
 import byow.InputDemo.KeyboardInputSource;
@@ -8,7 +9,9 @@ import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
+
 import java.util.*;
+
 public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
@@ -17,13 +20,18 @@ public class Engine {
     private long SEED;
     private Random RANDOM;
     private TETile[][] tiles;
+    private World world;
 
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
+     * n = new world
+     * l = load old world
+     * q = quit game
      */
     public void interactWithKeyboard() {
+
     }
 
     /**
@@ -57,7 +65,28 @@ public class Engine {
         // that works for many different input types.
 
         TETile[][] finalWorldFrame = null;
+        input = input.toLowerCase();
+        char first = input.charAt(0);
+        if (first == 'n') {
+            finalWorldFrame = newGame(input);
+        } else if (first == 'l') {
+            finalWorldFrame = loadGame(input);
+        } else if (first == 'q') {
+
+        }
         return finalWorldFrame;
     }
+
+    public TETile[][] newGame(String input) {
+        SEED = Long.parseLong(input.substring(1));
+        World w = new World(Long.toString(SEED), WIDTH, HEIGHT);
+        TETile[][] finalWorldFrame = w.getTiles();
+        return finalWorldFrame;
+    }
+
+    public TETile[][] loadGame(String input) {
+        return new TETile[0][];
+    }
+
 
 }
