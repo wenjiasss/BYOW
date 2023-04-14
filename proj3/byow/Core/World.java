@@ -68,37 +68,59 @@ public class World {
         for (int i = 0; i < w - 2; i++) {
             for (int j = 0; j < h - 2; j++) {
                 if (tiles[i][j] == Tileset.FLOOR) {
-                    if (tiles[i][j + 1] == Tileset.WALL) {
-                        if (tiles[i][j + 2] == Tileset.FLOOR) {
-                            tiles[i][j + 1] = Tileset.FLOOR;
-                        }
-                        if (tiles[i][j + 2] == Tileset.WALL && tiles[i][j + 3] == Tileset.FLOOR) {
-                            tiles[i][j + 1] = Tileset.FLOOR;
-                            tiles[i][j + 2] = Tileset.FLOOR;
-                        }
-                    }
-                    if (tiles[i + 1][j] == Tileset.WALL) {
-                        if (tiles[i + 2][j] == Tileset.FLOOR) {
-                            tiles[i + 1][j] = Tileset.FLOOR;
-                        }
-                        if (tiles[i + 2][j] == Tileset.WALL && tiles[i + 3][j] == Tileset.FLOOR) {
-                            tiles[i + 1][j] = Tileset.FLOOR;
-                            tiles[i + 2][j] = Tileset.FLOOR;
-                        }
-                    }
-
-                    pair p1 = helper2(i, j + 2, 0, 1);
-                    pair p2 = helper2(i + 2, j, 1, 0);
-                    if (tiles[i][j + 1] == Tileset.WALL && p1 != null && helper3(i, j + 1, p1, true)) {
-                        for (int k = j + 1; k < p1.y(); k++) {
-                            tiles[i][k] = Tileset.FLOOR;
-                        }
-                    } else if (tiles[i + 1][j] == Tileset.WALL && p2 != null && helper3(i + 1, j, p2, false)) {
-                        for (int k = i + 1; k < p2.x(); k++) {
-                            tiles[k][j] = Tileset.FLOOR;
-                        }
-                    }
+                    bw1(i, j);
+                    bw2(i, j);
+                    bw3(i, j);
                 }
+            }
+        }
+    }
+
+    private void bw1(int i, int j) {
+        if (tiles[i][j + 1] == Tileset.WALL) {
+            if (tiles[i][j + 2] == Tileset.FLOOR) {
+                tiles[i][j + 1] = Tileset.FLOOR;
+            }
+            if (tiles[i][j + 2] == Tileset.WALL && tiles[i][j + 3] == Tileset.FLOOR) {
+                tiles[i][j + 1] = Tileset.FLOOR;
+                tiles[i][j + 2] = Tileset.FLOOR;
+            }
+        }
+        if (tiles[i + 1][j] == Tileset.WALL) {
+            if (tiles[i + 2][j] == Tileset.FLOOR) {
+                tiles[i + 1][j] = Tileset.FLOOR;
+            }
+            if (tiles[i + 2][j] == Tileset.WALL && tiles[i + 3][j] == Tileset.FLOOR) {
+                tiles[i + 1][j] = Tileset.FLOOR;
+                tiles[i + 2][j] = Tileset.FLOOR;
+            }
+        }
+    }
+
+    private void bw2(int i, int j) {
+        pair p1 = helper2(i, j + 2, 0, 1);
+        pair p2 = helper2(i + 2, j, 1, 0);
+        if (tiles[i][j + 1] == Tileset.WALL && p1 != null && helper3(i, j + 1, p1, true)) {
+            for (int k = j + 1; k < p1.y(); k++) {
+                tiles[i][k] = Tileset.FLOOR;
+            }
+        } else if (tiles[i + 1][j] == Tileset.WALL && p2 != null && helper3(i + 1, j, p2, false)) {
+            for (int k = i + 1; k < p2.x(); k++) {
+                tiles[k][j] = Tileset.FLOOR;
+            }
+        }
+    }
+
+    private void bw3(int i, int j) {
+        pair p1 = helper4(i, j + 2, 0, 1);
+        pair p2 = helper4(i + 2, j, 1, 0);
+        if (tiles[i][j + 1] == Tileset.WALL && p1 != null && helper3(i, j + 1, p1, true)) {
+            for (int k = j + 1; k < p1.y()-1; k++) {
+                tiles[i][k] = Tileset.FLOOR;
+            }
+        } else if (tiles[i + 1][j] == Tileset.WALL && p2 != null && helper3(i + 1, j, p2, false)) {
+            for (int k = i + 1; k < p2.x()-1; k++) {
+                tiles[k][j] = Tileset.FLOOR;
             }
         }
     }
@@ -140,6 +162,20 @@ public class World {
             }
         }
         return (small || big);
+    }
+
+    private pair helper4(int i, int j, int a, int b) {
+        if (i == w || j == h) {
+            return null;
+        } else {
+            if (tiles[i][j] == Tileset.WALL) {
+                return helper4(i + a, j + b, a, b);
+            } else if (tiles[i][j] == Tileset.NOTHING) {
+                return new pair(i, j);
+            } else {
+                return null;
+            }
+        }
     }
 
     // generate Rooms on start and end of vertical hallways
