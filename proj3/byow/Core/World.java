@@ -15,14 +15,12 @@ public class World {
 
     private final ArrayList<pair> LeftBottom = new ArrayList<>();
     private final ArrayList<pair> RightTop = new ArrayList<>();
-
+    private final Random RANDOM;
+    private final TETile[][] tiles;
     /* Feel free to change the width and height. */
     public int w;
     public int h;
-
     TERenderer ter = new TERenderer();
-    private final Random RANDOM;
-    private final TETile[][] tiles;
 
 
     public World(String seed, int width, int height) {
@@ -52,7 +50,6 @@ public class World {
 
         breakWalls();
         breakWalls();
-        breakWalls2();
     }
 
     public static void main(String[] args) {
@@ -70,36 +67,34 @@ public class World {
     private void breakWalls() {
         for (int i = 0; i < w - 2; i++) {
             for (int j = 0; j < h - 2; j++) {
-                if (tiles[i][j] == Tileset.FLOOR && tiles[i][j + 1] == Tileset.WALL && tiles[i][j + 2] == Tileset.FLOOR) {
-                    tiles[i][j + 1] = Tileset.FLOOR;
-                }
-                if (tiles[i][j] == Tileset.FLOOR && tiles[i][j + 1] == Tileset.WALL && tiles[i][j + 2] == Tileset.WALL && tiles[i][j + 3] == Tileset.FLOOR) {
-                    tiles[i][j + 1] = Tileset.FLOOR;
-                    tiles[i][j + 2] = Tileset.FLOOR;
-                }
-                if (tiles[i][j] == Tileset.FLOOR && tiles[i + 1][j] == Tileset.WALL && tiles[i + 2][j] == Tileset.FLOOR) {
-                    tiles[i + 1][j] = Tileset.FLOOR;
-                }
-                if (tiles[i][j] == Tileset.FLOOR && tiles[i + 1][j] == Tileset.WALL && tiles[i + 2][j] == Tileset.WALL && tiles[i + 3][j] == Tileset.FLOOR) {
-                    tiles[i + 1][j] = Tileset.FLOOR;
-                    tiles[i + 2][j] = Tileset.FLOOR;
-                }
-            }
-        }
-    }
-
-    private void breakWalls2() {
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
                 if (tiles[i][j] == Tileset.FLOOR) {
-                    pair p1 = helper2(i, j+2, 0, 1);
-                    pair p2 = helper2(i+2, j, 1, 0);
-                    if (tiles[i][j+1] == Tileset.WALL && p1!=null && helper3(i, j+1, p1, true)) {
-                        for (int k = j+1; k < p1.y(); k++) {
+                    if (tiles[i][j + 1] == Tileset.WALL) {
+                        if (tiles[i][j + 2] == Tileset.FLOOR) {
+                            tiles[i][j + 1] = Tileset.FLOOR;
+                        }
+                        if (tiles[i][j + 2] == Tileset.WALL && tiles[i][j + 3] == Tileset.FLOOR) {
+                            tiles[i][j + 1] = Tileset.FLOOR;
+                            tiles[i][j + 2] = Tileset.FLOOR;
+                        }
+                    }
+                    if (tiles[i + 1][j] == Tileset.WALL) {
+                        if (tiles[i + 2][j] == Tileset.FLOOR) {
+                            tiles[i + 1][j] = Tileset.FLOOR;
+                        }
+                        if (tiles[i + 2][j] == Tileset.WALL && tiles[i + 3][j] == Tileset.FLOOR) {
+                            tiles[i + 1][j] = Tileset.FLOOR;
+                            tiles[i + 2][j] = Tileset.FLOOR;
+                        }
+                    }
+
+                    pair p1 = helper2(i, j + 2, 0, 1);
+                    pair p2 = helper2(i + 2, j, 1, 0);
+                    if (tiles[i][j + 1] == Tileset.WALL && p1 != null && helper3(i, j + 1, p1, true)) {
+                        for (int k = j + 1; k < p1.y(); k++) {
                             tiles[i][k] = Tileset.FLOOR;
                         }
-                    } else if (tiles[i+1][j] == Tileset.WALL && p2!=null && helper3(i+1, j, p2, false)) {
-                        for (int k = i+1; k < p2.x(); k++) {
+                    } else if (tiles[i + 1][j] == Tileset.WALL && p2 != null && helper3(i + 1, j, p2, false)) {
+                        for (int k = i + 1; k < p2.x(); k++) {
                             tiles[k][j] = Tileset.FLOOR;
                         }
                     }
@@ -109,12 +104,12 @@ public class World {
     }
 
     private pair helper2(int i, int j, int a, int b) {
-        if (i==w || j==h) {
+        if (i == w || j == h) {
             return null;
         } else {
             if (tiles[i][j] == Tileset.WALL) {
-                return helper2(i+a, j+b, a, b);
-            } else if (tiles[i][j]==Tileset.FLOOR) {
+                return helper2(i + a, j + b, a, b);
+            } else if (tiles[i][j] == Tileset.FLOOR) {
                 return new pair(i, j);
             } else {
                 return null;
@@ -123,23 +118,23 @@ public class World {
     }
 
     private boolean helper3(int i, int j, pair p, boolean vertical) {
-        boolean small=true;
-        boolean big=true;
+        boolean small = true;
+        boolean big = true;
         if (vertical) {
             for (int g = j; g < p.y(); g++) {
-                if (tiles[i-1][g] != Tileset.WALL) {
+                if (tiles[i - 1][g] != Tileset.WALL) {
                     small = false;
                 }
-                if (tiles[i+1][g] != Tileset.WALL) {
+                if (tiles[i + 1][g] != Tileset.WALL) {
                     big = false;
                 }
             }
         } else {
             for (int g = i; g < p.x(); g++) {
-                if (tiles[g][j-1] != Tileset.WALL) {
+                if (tiles[g][j - 1] != Tileset.WALL) {
                     small = false;
                 }
-                if (tiles[g][j+1] != Tileset.WALL) {
+                if (tiles[g][j + 1] != Tileset.WALL) {
                     big = false;
                 }
             }
@@ -228,7 +223,7 @@ public class World {
                 pair r = RightTop.get(i);
                 int oldLength = Math.abs(l.y - r.y);
                 int oldWidth = Math.abs(l.x - r.x);
-                Rectangle r2 = new Rectangle(l.x()-1, l.y()-1, oldWidth+1, oldLength+1);
+                Rectangle r2 = new Rectangle(l.x() - 1, l.y() - 1, oldWidth + 1, oldLength + 1);
                 if (r2.intersects(r1)) {
                     return true;
                 }
@@ -320,7 +315,7 @@ public class World {
                         tiles[x][i] = Tileset.FLOOR;
                     }
                     if (stop == 1) {
-                        end = new pair(x, i+2);
+                        end = new pair(x, i + 2);
                         break;
                     } else {
                         tiles[x][i + 2] = Tileset.FLOOR;
@@ -372,7 +367,7 @@ public class World {
                         tiles[i][y] = Tileset.FLOOR;
                     }
                     if (stop == 1) {
-                        end = new pair(i+2, y);
+                        end = new pair(i + 2, y);
                         break;
                     } else {
                         tiles[i + 2][y] = Tileset.FLOOR;
@@ -578,5 +573,26 @@ public class World {
 //            RightTop.add(roomEnd);
 //        }
 //
+//    }
+
+
+//    private void breakWalls2() {
+//        for (int i = 0; i < w; i++) {
+//            for (int j = 0; j < h; j++) {
+//                if (tiles[i][j] == Tileset.FLOOR) {
+//                    pair p1 = helper2(i, j + 2, 0, 1);
+//                    pair p2 = helper2(i + 2, j, 1, 0);
+//                    if (tiles[i][j + 1] == Tileset.WALL && p1 != null && helper3(i, j + 1, p1, true)) {
+//                        for (int k = j + 1; k < p1.y(); k++) {
+//                            tiles[i][k] = Tileset.FLOOR;
+//                        }
+//                    } else if (tiles[i + 1][j] == Tileset.WALL && p2 != null && helper3(i + 1, j, p2, false)) {
+//                        for (int k = i + 1; k < p2.x(); k++) {
+//                            tiles[k][j] = Tileset.FLOOR;
+//                        }
+//                    }
+//                }
+//            }
+//        }
 //    }
 }
