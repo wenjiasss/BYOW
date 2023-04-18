@@ -6,6 +6,7 @@ import byow.InputDemo.InputSource;
 import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import edu.princeton.cs.algs4.StdDraw;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -16,6 +17,7 @@ public class Engine {
     private Random RANDOM;
     private TETile[][] tiles;
     private World world;
+    private Menu menu = new Menu(WIDTH,HEIGHT);
 
     public Engine() {
         tiles = new TETile[WIDTH][HEIGHT];
@@ -29,8 +31,22 @@ public class Engine {
      * q = quit game
      */
     public void interactWithKeyboard() {
+        menu.drawMenu();
+        //game start
+        while (true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char c = Character.toLowerCase(StdDraw.nextKeyTyped());
+                if (c == 'w') { //up
 
+                } else if (c == 'a') { //left
 
+                } else if (c == 's') { //right
+
+                } else if (c == 'd') { //bottom
+
+                }
+            }
+        }
     }
 
     /**
