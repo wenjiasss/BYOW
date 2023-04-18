@@ -10,10 +10,10 @@ public class breakWalls {
     public int w;
     public int h;
 
-    public breakWalls(TETile[][] t, int w, int h) {
+    public breakWalls(TETile[][] t) {
         this.t = t;
-        this.w = w;
-        this.h = h;
+        this.w = t.length;
+        this.h = t[0].length;
         breakIT();
         breakIT();
     }

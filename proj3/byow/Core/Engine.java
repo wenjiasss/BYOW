@@ -1,5 +1,6 @@
 package byow.Core;
 
+import java.awt.*;
 import java.util.Random;
 
 import byow.InputDemo.InputSource;
@@ -7,6 +8,12 @@ import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import edu.princeton.cs.algs4.StdDraw;
+
+import byow.TileEngine.TERenderer;
+import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
+
+import byow.Core.Avatar;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -17,10 +24,16 @@ public class Engine {
     private Random RANDOM;
     private TETile[][] tiles;
     private World world;
-    private Menu menu = new Menu(WIDTH,HEIGHT);
+    private Menu menu;
+    private Avatar person;
+
+    private boolean gameOver;
 
     public Engine() {
         tiles = new TETile[WIDTH][HEIGHT];
+        person = new Avatar(Tileset.AVATAR, tiles);
+        menu = new Menu(WIDTH, HEIGHT);
+        gameOver = true;
     }
 
     /**
@@ -31,9 +44,24 @@ public class Engine {
      * q = quit game
      */
     public void interactWithKeyboard() {
+
+        //menu
         menu.drawMenu();
+        String seeds = "";
+        while (StdDraw.hasNextKeyTyped()) {
+            char c = StdDraw.nextKeyTyped();
+            if (c == 's') {
+                break;
+            } else if (Character.isDigit(c)){
+                seeds = seeds + c;
+                drawFrame(seeds);
+            }
+        }
+        World w = new World(seeds, WIDTH, HEIGHT);
+        tiles = w.getTiles();
+
         //game start
-        while (true) {
+        while (!gameOver) {
             if (StdDraw.hasNextKeyTyped()) {
                 char c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'w') { //up
@@ -92,7 +120,8 @@ public class Engine {
             }
         }
         World w = new World(seeds, WIDTH, HEIGHT);
-        return w.getTiles();
+        tiles = w.getTiles();
+        return tiles;
     }
 
 
@@ -101,11 +130,35 @@ public class Engine {
     }
 
 
-    public static void main(String[] args) {
-        Engine engine = new Engine();
-        TETile[][] t = engine.interactWithInputString("N87536S");
-        TERenderer ter = new TERenderer();
-        //   ter.initialize(80, 40);
-        //    ter.renderFrame(t);
+//    public static void main(String[] args) {
+//        Engine engine = new Engine();
+//        engine.interactWithKeyboard();
+//
+//        TETile[][] t = engine.interactWithInputString("N87536S");
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(80, 40);
+//        ter.renderFrame(t);
+//        }
+
+    //@source lab13
+    public void drawFrame(String s) {
+        /* Take the input string S and display it at the center of the screen,
+         * with the pen settings given below. */
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(fontBig);
+        StdDraw.text(this.WIDTH / 2, this.HEIGHT / 2, s);
+
+        /* If the game is not over, display encouragement, and let the user know if they
+         * should be typing their answer or watching for the next round. */
+        if (!gameOver) {
+            Font fontSmall = new Font("Monaco", Font.BOLD, 20);
+            StdDraw.setFont(fontSmall);
+            StdDraw.line(0, this.HEIGHT - 2, this.WIDTH, this.HEIGHT - 2);
+            StdDraw.text(this.WIDTH / 2, this.HEIGHT - 1, "Type!");
+            StdDraw.text(this.WIDTH / 2, this.HEIGHT - 1, "Watch!");
+        }
+        StdDraw.show();
     }
 }

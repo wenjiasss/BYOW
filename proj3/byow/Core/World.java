@@ -48,7 +48,7 @@ public class World {
             generateRoom(i);
         }
 
-        breakWalls b = new breakWalls(tiles, w, h);
+        breakWalls b = new breakWalls(tiles);
         this.tiles = b.getTiles();
     }
 
