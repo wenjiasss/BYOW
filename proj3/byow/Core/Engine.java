@@ -73,8 +73,10 @@ public class Engine {
         while (gameStart) {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
-                if (c == 'w' || c == 'a' || c == 's' || c == 'd') { //bottom
-
+                if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
+                    tiles = interactWithInputString(input);
+                    ter.renderFrame(tiles);
+                    break;
                 }
             }
         }
