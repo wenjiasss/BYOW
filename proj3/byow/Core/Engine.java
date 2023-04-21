@@ -44,26 +44,29 @@ public class Engine {
      * q = quit game
      */
     public void interactWithKeyboard() {
-
         //menu
         menu.drawMenu();
         String seeds = "";
-        while (StdDraw.hasNextKeyTyped()) {
-            char c = StdDraw.nextKeyTyped();
-            if (c == 's') {
-                break;
-            } else if (Character.isDigit(c)){
+        char c;
+        while (true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                c = Character.toLowerCase(StdDraw.nextKeyTyped());
+                if (c == 'q' || c == 's' || c == 'l') {
+                    seeds = seeds + c;
+                    drawFrame(seeds);
+                    break;
+                }
                 seeds = seeds + c;
                 drawFrame(seeds);
             }
         }
-        World w = new World(seeds, WIDTH, HEIGHT);
-        tiles = w.getTiles();
+
+        interactWithInputString(seeds);
 
         //game start
         while (!gameOver) {
             if (StdDraw.hasNextKeyTyped()) {
-                char c = Character.toLowerCase(StdDraw.nextKeyTyped());
+                c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'w') { //up
 
                 } else if (c == 'a') { //left
