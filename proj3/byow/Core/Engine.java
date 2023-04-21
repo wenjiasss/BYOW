@@ -161,4 +161,55 @@ public class Engine {
         }
         StdDraw.show();
     }
+
+
+
+    public void resetWorld() {
+        tiles = new TETile[WIDTH][HEIGHT];
+    }
+
+    private pair getCursorPosition(TERenderer r) {
+        int cursorX = r.mouseX();
+        int cursorY = r.mouseY();
+        return new pair(cursorX, cursorY);
+    }
+
+    private String showBlockAlt(pair pos) {
+        int x = pos.x();
+        int y = pos.y();
+        if (x < 0 || x >= 80 || y < 0 || y >= 30) {
+            return "nothing";
+        }
+        TETile tile = tiles[x][y];
+        if (tile.equals(Tileset.FLOOR)) {
+            return "floor";
+        } else if (tile.equals(Tileset.WALL)) {
+            return "solid walls";
+        } else if (tile.equals(person.getSkin())) {
+            return "yourself";
+        }
+        return "nothing";
+    }
+
+    private TETile[][] AvatarMove (InputSource inputSource) {
+        while (inputSource.possibleNextInput()) {
+            char c = inputSource.getNextKey();
+            if (c == 'w' || c == 'W') {
+                tiles = person.moveUp();
+            }
+            if (c == 'a' || c == 'A') {
+                tiles = person.moveLeft();
+            }
+            if (c == 's' || c == 'S') {
+                tiles = person.moveDown();
+            }
+            if (c == 'd' || c == 'D') {
+                tiles = person.moveRight();
+            }
+        }
+    }
+
+    private record pair(int x, int y) {
+    }
+
 }

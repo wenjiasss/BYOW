@@ -98,4 +98,14 @@ public class TERenderer {
         }
         StdDraw.show();
     }
+
+    public int mouseX() {
+        int intx = (int) StdDraw.mouseX();
+        return intx - 1;
+    }
+
+    public int mouseY() {
+        int inty = (int) StdDraw.mouseY();
+        return inty - 1;
+    }
 }

@@ -25,7 +25,7 @@ public class Avatar {
         return x >= 1 && x < tiles.length - 1 && y >= 1 && y < tiles[0].length - 1;
     }
 
-    private TETile[][] moveUp() {
+    public TETile[][] moveUp() {
         int newposx = this.position.x();
         int newposy = this.position.y() + 1;
         if (movable(newposx, newposy)) {
@@ -35,7 +35,7 @@ public class Avatar {
         }
         return tiles;
     }
-    private TETile[][] moveDown() {
+    public TETile[][] moveDown() {
         int newposx = this.position.x();
         int newposy = this.position.y() - 1;
         if (movable(newposx, newposy)) {
@@ -45,7 +45,7 @@ public class Avatar {
         }
         return tiles;
     }
-    private TETile[][] moveRight() {
+    public TETile[][] moveRight() {
         int newposx = this.position.x() + 1;
         int newposy = this.position.y();
         if (movable(newposx, newposy)) {
@@ -55,7 +55,7 @@ public class Avatar {
         }
         return tiles;
     }
-    private TETile[][] moveLeft() {
+    public TETile[][] moveLeft() {
         int newposx = this.position.x() - 1;
         int newposy = this.position.y();
         if (movable(newposx, newposy)) {
@@ -64,6 +64,10 @@ public class Avatar {
             this.move(new pair(newposx, newposy));
         }
         return tiles;
+    }
+
+    public TETile getSkin() {
+        return skin;
     }
 
     private record pair(int x, int y) {
