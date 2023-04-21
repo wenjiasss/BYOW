@@ -125,7 +125,7 @@ public class Engine {
         World w = new World(seeds, WIDTH, HEIGHT);
         tiles = w.getTiles();
         while (inputSource.possibleNextInput()) {
-            block = showBlockAt(r)
+            block = showBlockAt(r);
             char c = inputSource.getNextKey();
             AvatarMove(c);
         }
