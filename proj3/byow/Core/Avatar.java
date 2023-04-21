@@ -84,4 +84,13 @@ public class Avatar {
 
     private record pair(int x, int y) {
     }
+
+    public String getPositionX() {
+        return ""+ position.x;
+    }
+    public String getPositionY() {
+        return ""+ position.y;
+    }
+
+
 }

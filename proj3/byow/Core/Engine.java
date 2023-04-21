@@ -1,6 +1,8 @@
 package byow.Core;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.*;
 import java.util.Random;
 
 import byow.InputDemo.InputSource;
@@ -14,6 +16,7 @@ import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
 import byow.Core.Avatar;
+
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -55,6 +58,7 @@ public class Engine {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'q' || c == 's' || c == 'l') {
                     drawFrame("Enter a random seed: " + input + c);
+                    SEED = Long.parseLong(input);
                     break;
                 }
                 input = input + c;
@@ -74,10 +78,20 @@ public class Engine {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
-                    tiles = interactWithInputString(input);
+                    AvatarMove(c);
                     ter.renderFrame(tiles);
-                    break;
                 }
+                if (c == ':' && Character.toLowerCase(StdDraw.nextKeyTyped()) == 'q') {
+                    saveAndQuit();
+                }
+
+                if(c == 'l'){
+                    load();
+                }
+                if (c == 'q') {
+                    System.exit(0);
+                }
+
             }
         }
     }
@@ -140,21 +154,45 @@ public class Engine {
         return tiles;
     }
 
+    public void load() {
+        try {
+            FileReader f = new FileReader("savegame.txt");
+            BufferedReader bufferedReader = new BufferedReader(f);
+            String line = bufferedReader.readLine();
+            String[] input = line.split(",");
+            if (line != null) {
+                input = line.split(",");
+                SEED = Long.parseLong(input[1]); // seed
+                // tiles = person.move(); person position
+            }
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
 
-    public TETile[][] loadGame(String input) {
-        return tiles;
+    }
+
+    public void saveAndQuit() {
+        try {
+            FileWriter f = new FileWriter("savegame.txt");
+            f.write(SEED + "" + "," + person.getPositionX() + "," + person.getPositionY());
+            f.close();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        System.exit(0);
     }
 
 
-//    public static void main(String[] args) {
-//        Engine engine = new Engine();
-//        engine.interactWithKeyboard();
-//
-//        TETile[][] t = engine.interactWithInputString("N87536S");
-//        TERenderer ter = new TERenderer();
-//        ter.initialize(80, 40);
-//        ter.renderFrame(t);
-//        }
+    public static void main(String[] args) {
+        Engine engine = new Engine();
+        //engine.interactWithKeyboard();
+
+        TETile[][] t = engine.interactWithInputString("N92054114S");
+        TERenderer ter = new TERenderer();
+        ter.initialize(80, 40);
+        ter.renderFrame(t);
+    }
 
     //@source lab13
     public void drawFrame(String s) {
