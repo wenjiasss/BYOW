@@ -27,13 +27,13 @@ public class Engine {
     private Menu menu;
     private Avatar person;
 
-    private boolean gameOver;
+    private boolean gameStart;
 
     public Engine() {
         tiles = new TETile[WIDTH][HEIGHT];
         person = new Avatar(Tileset.AVATAR, tiles);
         menu = new Menu(WIDTH, HEIGHT);
-        gameOver = true;
+        gameStart = false;
     }
 
     /**
@@ -46,34 +46,34 @@ public class Engine {
     public void interactWithKeyboard() {
         //menu
         menu.drawMenu();
-        String seeds = "";
+
+        //random seed
+        String input = "";
         char c;
         while (true) {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'q' || c == 's' || c == 'l') {
-                    seeds = seeds + c;
-                    drawFrame(seeds);
+                    drawFrame("Enter a random seed: " + input + c);
                     break;
                 }
-                seeds = seeds + c;
-                drawFrame(seeds);
+                input = input + c;
+                drawFrame("Enter a random seed: " + input);
             }
         }
 
-        interactWithInputString(seeds);
+        //game
+        gameStart = true;
+        tiles = interactWithInputString(input);
+        ter.initialize(WIDTH, HEIGHT);
+        ter.renderFrame(tiles);
+
 
         //game start
-        while (!gameOver) {
+        while (gameStart) {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
-                if (c == 'w') { //up
-
-                } else if (c == 'a') { //left
-
-                } else if (c == 's') { //right
-
-                } else if (c == 'd') { //bottom
+                if (c == 'w' || c == 'a' || c == 's' || c == 'd') { //bottom
 
                 }
             }
@@ -124,6 +124,11 @@ public class Engine {
         }
         World w = new World(seeds, WIDTH, HEIGHT);
         tiles = w.getTiles();
+        while (inputSource.possibleNextInput()) {
+            block = showBlockAt(r)
+            char c = inputSource.getNextKey();
+            AvatarMove(c);
+        }
         return tiles;
     }
 
@@ -152,34 +157,17 @@ public class Engine {
         Font fontBig = new Font("Monaco", Font.BOLD, 30);
         StdDraw.setFont(fontBig);
         StdDraw.text(this.WIDTH / 2, this.HEIGHT / 2, s);
-
-        /* If the game is not over, display encouragement, and let the user know if they
-         * should be typing their answer or watching for the next round. */
-        if (!gameOver) {
-            Font fontSmall = new Font("Monaco", Font.BOLD, 20);
-            StdDraw.setFont(fontSmall);
-            StdDraw.line(0, this.HEIGHT - 2, this.WIDTH, this.HEIGHT - 2);
-            StdDraw.text(this.WIDTH / 2, this.HEIGHT - 1, "Type!");
-            StdDraw.text(this.WIDTH / 2, this.HEIGHT - 1, "Watch!");
-        }
         StdDraw.show();
     }
-
 
 
     public void resetWorld() {
         tiles = new TETile[WIDTH][HEIGHT];
     }
 
-    private pair getCursorPosition(TERenderer r) {
-        int cursorX = r.mouseX();
-        int cursorY = r.mouseY();
-        return new pair(cursorX, cursorY);
-    }
-
-    private String showBlockAlt(pair pos) {
-        int x = pos.x();
-        int y = pos.y();
+    private String showBlockAt(TERenderer r) {
+        int x = r.mouseX();
+        int y = r.mouseY();
         if (x < 0 || x >= 80 || y < 0 || y >= 30) {
             return "nothing";
         }
@@ -194,21 +182,18 @@ public class Engine {
         return "nothing";
     }
 
-    private TETile[][] AvatarMove (InputSource inputSource) {
-        while (inputSource.possibleNextInput()) {
-            char c = inputSource.getNextKey();
-            if (c == 'w' || c == 'W') {
-                tiles = person.moveUp();
-            }
-            if (c == 'a' || c == 'A') {
-                tiles = person.moveLeft();
-            }
-            if (c == 's' || c == 'S') {
-                tiles = person.moveDown();
-            }
-            if (c == 'd' || c == 'D') {
-                tiles = person.moveRight();
-            }
+    private void AvatarMove(char c) {
+        if (c == 'w' || c == 'W') {
+            tiles = person.moveUp();
+        }
+        if (c == 'a' || c == 'A') {
+            tiles = person.moveLeft();
+        }
+        if (c == 's' || c == 'S') {
+            tiles = person.moveDown();
+        }
+        if (c == 'd' || c == 'D') {
+            tiles = person.moveRight();
         }
     }
 

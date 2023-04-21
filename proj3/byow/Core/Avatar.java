@@ -13,6 +13,18 @@ public class Avatar {
     public Avatar(TETile s, TETile[][] t) {
         this.skin = s;
         this.tiles = t;
+        initialize();
+    }
+
+    private void initialize() {
+        for (int i  = 0; i < tiles.length; i++) {
+            for (int j  = 0; j < tiles[0].length; j++) {
+                if (movable(i, j)) {
+                    move(new pair(i, j));
+                    break;
+                }
+            }
+        }
     }
 
     public void move(pair pos) {
