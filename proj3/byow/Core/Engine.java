@@ -124,8 +124,14 @@ public class Engine {
         }
         World w = new World(seeds, WIDTH, HEIGHT);
         tiles = w.getTiles();
+
+        //String block = ""；
+        //TERenderer r = new TERenderer();
+        //r.initialize(82, 32, 1, 1);
+        //r.renderFrame(...);
         while (inputSource.possibleNextInput()) {
-            block = showBlockAt(r)
+            //block = blockAt(r);
+            //r.renderFrame1(...);
             char c = inputSource.getNextKey();
             AvatarMove(c);
         }
@@ -165,7 +171,7 @@ public class Engine {
         tiles = new TETile[WIDTH][HEIGHT];
     }
 
-    private String showBlockAt(TERenderer r) {
+    private String blockAt(TERenderer r) {
         int x = r.mouseX();
         int y = r.mouseY();
         if (x < 0 || x >= 80 || y < 0 || y >= 30) {
