@@ -32,7 +32,7 @@ public class Menu {
         //menu
         Font fontSmall = new Font("Monaco", Font.BOLD, 30);
         StdDraw.setFont(fontSmall);
-        StdDraw.text(this.width / 2, this.height / 2 + 10, " \"New Game (N)\" \"Load Game (L)\" \"Quit (Q)\"");
+        StdDraw.text(this.width / 2, this.height / 2 + 10, " \"New Game (N)\" \"Load Game (L)\" \"Quit (Q)\" \"Change Avatar (C)\"");
 
         StdDraw.show();
     }

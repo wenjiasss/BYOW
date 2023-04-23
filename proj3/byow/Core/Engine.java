@@ -3,6 +3,9 @@ package byow.Core;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 
 import byow.InputDemo.InputSource;
@@ -10,6 +13,9 @@ import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.Out;
+import edu.princeton.cs.algs4.In;
+
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
@@ -29,12 +35,13 @@ public class Engine {
     private World world;
     private Menu menu;
     private Avatar person;
+    public static final TETile PERSON = new TETile('@', Color.white, Color.black, "you", Paths.get("byow", "img", "person.png").toString());
 
     private boolean gameStart;
 
     public Engine() {
         tiles = new TETile[WIDTH][HEIGHT];
-        person = new Avatar(Tileset.AVATAR, tiles);
+        //   person = new Avatar(Tileset.AVATAR, tiles);
         menu = new Menu(WIDTH, HEIGHT);
         gameStart = false;
     }
@@ -60,9 +67,13 @@ public class Engine {
                     drawFrame("Enter a random seed: " + input + c);
                     SEED = Long.parseLong(input);
                     break;
+                    System.exit(0);
+                    drawFrame("Enter a seed ending with s: " + input);
+                    if (c == 's') {
+                        break;
+                    }
+                    input = input + c;
                 }
-                input = input + c;
-                drawFrame("Enter a random seed: " + input);
             }
         }
 
@@ -72,26 +83,22 @@ public class Engine {
         ter.initialize(WIDTH, HEIGHT);
         ter.renderFrame(tiles);
 
-
+        input = "";
         //game start
         while (gameStart) {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
-                    AvatarMove(c);
+                    // AvatarMove(c);
                     ter.renderFrame(tiles);
+                } else if (c == 'l') {
+                    load();
+                } else {
+                    input += c;
                 }
-                if (c == ':' && Character.toLowerCase(StdDraw.nextKeyTyped()) == 'q') {
+                if (input.equals(":q")) {
                     saveAndQuit();
                 }
-
-                if(c == 'l'){
-                    load();
-                }
-                if (c == 'q') {
-                    System.exit(0);
-                }
-
             }
         }
     }
@@ -154,35 +161,35 @@ public class Engine {
         return tiles;
     }
 
+
     public void load() {
-        try {
-            FileReader f = new FileReader("savegame.txt");
-            BufferedReader bufferedReader = new BufferedReader(f);
-            String line = bufferedReader.readLine();
-            String[] input = line.split(",");
-            if (line != null) {
-                input = line.split(",");
-                SEED = Long.parseLong(input[1]); // seed
-                // tiles = person.move(); person position
-            }
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+        Path path = Paths.get("savegame.txt");
+
+        if (!Files.exists(path)) {
+            System.exit(0);
+        }
+        In in = new In(path.toFile());
+        String line = in.readLine();
+        String[] input = line.split(",");
+        if (line != null) {
+            input = line.split(",");
+            //   SEED = Long.parseLong(input[1]); // seed
+            tiles = interactWithInputString(input[1]);
+            ter.renderFrame(tiles);
+            // tiles = person.move(); person position
         }
 
     }
 
+
     public void saveAndQuit() {
-        try {
-            FileWriter f = new FileWriter("savegame.txt");
-            f.write(SEED + "" + "," + person.getPositionX() + "," + person.getPositionY());
-            f.close();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
+        Out out = new Out("savegame.txt");
+        //seed, avatarX, avatarY
+        out.print("1267,20,30");
+        // out.print(SEED + "" + "," + "person.getPositionX()" + "," + "person.getPositionY()");
 
         System.exit(0);
     }
-
 
     public static void main(String[] args) {
         Engine engine = new Engine();
@@ -206,14 +213,26 @@ public class Engine {
         StdDraw.show();
     }
 
-
-    public void resetWorld() {
-        tiles = new TETile[WIDTH][HEIGHT];
+    //doesn't work
+    public void displayHUD() {
+        StdDraw.clear(Color.BLACK);
+        //      StdDraw.filledRectangle(WIDTH, HEIGHT, WIDTH - 10, HEIGHT - 10);
+        StdDraw.setPenColor(Color.WHITE);
+        Font fontBig = new Font("Monaco", Font.BOLD, 20);
+        StdDraw.setFont(fontBig);
+        // String s = "Tile: " + blockAt(ter);
+        String s = "Tile: ";
+        StdDraw.text(this.WIDTH / 2, this.HEIGHT / 2, s);
+        StdDraw.show();
     }
 
     private String blockAt(TERenderer r) {
         int x = r.mouseX();
         int y = r.mouseY();
+
+//        int x = (int) StdDraw.mouseX();
+//        int y = (int) StdDraw.mouseY();
+
         if (x < 0 || x >= 80 || y < 0 || y >= 30) {
             return "nothing";
         }
@@ -241,6 +260,10 @@ public class Engine {
         if (c == 'd' || c == 'D') {
             tiles = person.moveRight();
         }
+    }
+
+    public void resetWorld() {
+        tiles = new TETile[WIDTH][HEIGHT];
     }
 
     private record pair(int x, int y) {
