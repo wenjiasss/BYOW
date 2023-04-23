@@ -63,11 +63,13 @@ public class Engine {
         while (true) {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
-                if (c == 'q' || c == 's' || c == 'l') {
-                    drawFrame("Enter a random seed: " + input + c);
-                    SEED = Long.parseLong(input);
-                    break;
+                if (c == 'q') { //quit
                     System.exit(0);
+                } else if (c == 'l') { //load
+                    load();
+                } else if (c == 'c') { //change avatar
+
+                } else { // new game
                     drawFrame("Enter a seed ending with s: " + input);
                     if (c == 's') {
                         break;
