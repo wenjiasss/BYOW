@@ -64,7 +64,7 @@ public class Engine {
                 } else if (c == 'r') {
                     replayLastSave();
                 } else { // new game
-                    drawFrame("Enter a seed ending with s: " + input);
+                    drawFrame("Enter a seed ending with s: " + input + c);
                     if (c == 's') {
                         break;
                     }
@@ -264,7 +264,7 @@ public class Engine {
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
                     avatarMove(c);
                     ter.renderFrame(tiles, block);
-                    StdDraw.pause(1000);
+                    //  StdDraw.pause(1000);
                 } else {
                     notValid = notValid + c;
                 }
