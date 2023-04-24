@@ -15,7 +15,8 @@ public class Avatar {
         this.tiles = t;
     }
 
-    public void initialize() {
+    public TETile[][] initialize(TETile[][] t) {
+        updateTiles(t);
         for (int i  = 0; i < tiles.length; i++) {
             for (int j  = 0; j < tiles[0].length; j++) {
                 if (movable(i, j)) {
@@ -24,10 +25,14 @@ public class Avatar {
                     break;
                 }
             }
+            if (this.position!=null) {
+                break;
+            }
         }
+        return tiles;
     }
 
-    public void updateTiles(TETile[][] t) {
+    private void updateTiles(TETile[][] t) {
         tiles = t;
     }
 

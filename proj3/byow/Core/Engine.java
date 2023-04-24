@@ -154,9 +154,7 @@ public class Engine {
         //TERenderer r = new TERenderer();
         //r.initialize(82, 32, 1, 1);
         //r.renderFrame(...);
-        person.updateTiles(tiles);
-        person.initialize();
-        tiles = person.getTiles();
+        tiles = person.initialize(tiles);
         while (inputSource.possibleNextInput()) {
             //block = blockAt(r);
             //r.renderFrame1(...);
