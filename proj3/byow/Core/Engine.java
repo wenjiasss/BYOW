@@ -149,7 +149,9 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
+
         input = input.toLowerCase();
+        userInput = input;
         String seeds = "";
         String movement = "";
         char firstChar = input.charAt(0);
@@ -162,6 +164,9 @@ public class Engine {
             movement = input.substring(seedEnd);
             SEED = Long.parseLong(seeds);
         }
+
+        World w = new World(Long.toString(SEED), WIDTH, HEIGHT);
+        tiles = w.getTiles();
 
         String block = "";
         ter.initialize(WIDTH, HEIGHT);
@@ -214,7 +219,7 @@ public class Engine {
             int avatarX = Integer.parseInt(lineArray[1]);
             int avatarY = Integer.parseInt(lineArray[2]);
             String savedUserInput = lineArray[3];
-            person.changePosition(avatarX, avatarY);
+          //  person.changePosition(avatarX, avatarY);
             tiles = interactWithInputString(savedUserInput);
             ter.renderFrame(tiles, "");
             // tiles = person.move(); person position
@@ -260,7 +265,7 @@ public class Engine {
 
         // TETile[][] t = engine.interactWithInputString("N92054114S");
       //   TETile[][] t = engine.interactWithInputString("N6647S");
-       TETile[][] t = engine.interactWithInputString("L:Q");
+       TETile[][] t = engine.interactWithInputString("LWWWDDD");
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         ter.renderFrame(t, "");
@@ -281,9 +286,6 @@ public class Engine {
     private String blockAt(TERenderer r) {
         int x = r.mouseX();
         int y = r.mouseY();
-
-//        int x = (int) StdDraw.mouseX();
-//        int y = (int) StdDraw.mouseY();
 
         if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
             return "nothing";

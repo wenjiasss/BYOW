@@ -90,7 +90,8 @@ public class Avatar {
     public void changePosition(int x, int y) {
         coordinate c = new coordinate(x, y);
         if (movable(x, y)) {
-            this.move(c);
+            this.position = c;
+            tiles[x][y] = this.skin;
         }
     }
 
