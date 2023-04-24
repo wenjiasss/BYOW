@@ -5,7 +5,6 @@ import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
-import byow.Core.World;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Out;
 import edu.princeton.cs.algs4.StdDraw;
@@ -186,7 +185,7 @@ public class Engine {
                 notValid = notValid + c;
             }
             if (notValid.equals(":q")) {
-                saveAndQuit();
+                saveAndQuitForInputString();
             }
         }
 ////        TERenderer r = new TERenderer();
@@ -219,7 +218,7 @@ public class Engine {
             int avatarX = Integer.parseInt(lineArray[1]);
             int avatarY = Integer.parseInt(lineArray[2]);
             String savedUserInput = lineArray[3];
-          //  person.changePosition(avatarX, avatarY);
+            //  person.changePosition(avatarX, avatarY);
             tiles = interactWithInputString(savedUserInput);
             ter.renderFrame(tiles, "");
             // tiles = person.move(); person position
@@ -242,14 +241,18 @@ public class Engine {
             int avatarY = Integer.parseInt(lineArray[2]);
             String savedUserInput = lineArray[3];
 
-
-
             ter.renderFrame(tiles, "");
-            // tiles = person.move(); person position
 
         }
     }
 
+
+    public void saveAndQuitForInputString() {
+        Out out = new Out("savegame.txt");
+        //seed, avatarX, avatarY, userInput
+        String saved = SEED + "," + person.getPositionX() + "," + person.getPositionY() + "," + userInput;
+        out.print(saved);
+    }
 
     public void saveAndQuit() {
         Out out = new Out("savegame.txt");
@@ -264,8 +267,8 @@ public class Engine {
         //engine.interactWithKeyboard();
 
         // TETile[][] t = engine.interactWithInputString("N92054114S");
-      //   TETile[][] t = engine.interactWithInputString("N6647S");
-       TETile[][] t = engine.interactWithInputString("LWWWDDD");
+        //   TETile[][] t = engine.interactWithInputString("N6647S");
+        TETile[][] t = engine.interactWithInputString("LWWWDDD");
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         ter.renderFrame(t, "");
@@ -315,5 +318,6 @@ public class Engine {
             tiles = person.moveRight();
         }
     }
+
 
 }
