@@ -261,22 +261,34 @@ public class Engine {
         if (line != null) {
             lineArray = line.split(",");
             SEED = Long.parseLong(lineArray[0]);
-            int avatarX = Integer.parseInt(lineArray[1]);
-            int avatarY = Integer.parseInt(lineArray[2]);
-            String input = lineArray[3];
+            String input = lineArray[1];
+
             input = input.toLowerCase();
             userInput = input;
             String seeds = "";
             String movement = "";
-
             char firstChar = input.charAt(0);
             if (firstChar == 'l') { //load
                 load(); //gets seed
                 movement = input;
             } else if (firstChar == 'n') { //new game
-                int seedEnd = input.indexOf('s');
-                seeds = input.substring(1, seedEnd - 1);
-                movement = input.substring(seedEnd);
+                int s = 0;
+                for (int i = 1; i < input.length(); i++) {
+                    if (input.charAt(i) != 's') {
+                        seeds += input.charAt(i);
+                    } else {
+                        s = i;
+                        break;
+                    }
+                }
+                for (int i = s+1; i < input.length(); i++) {
+                    if (input.charAt(i) == ':') {
+                        break;
+                    } else {
+                        movement += input.charAt(i);
+                    }
+
+                }
                 SEED = Long.parseLong(seeds);
             }
 
@@ -304,6 +316,8 @@ public class Engine {
             }
             ter.renderFrame(tiles, "");
             StdDraw.pause(100);
+            gameStart = true;
+            userInput = "";
             interactWithKeyboard();
         }
     }
