@@ -41,7 +41,7 @@ public class Engine {
 
     public Engine() {
         tiles = new TETile[WIDTH][HEIGHT];
-        //   person = new Avatar(Tileset.AVATAR, tiles);
+        person = new Avatar(Tileset.AVATAR, tiles);
         menu = new Menu(WIDTH, HEIGHT);
         gameStart = false;
     }
@@ -154,6 +154,9 @@ public class Engine {
         //TERenderer r = new TERenderer();
         //r.initialize(82, 32, 1, 1);
         //r.renderFrame(...);
+        person.updateTiles(tiles);
+        person.initialize();
+        tiles = person.getTiles();
         while (inputSource.possibleNextInput()) {
             //block = blockAt(r);
             //r.renderFrame1(...);

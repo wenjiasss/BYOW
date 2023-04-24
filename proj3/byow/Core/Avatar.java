@@ -13,13 +13,13 @@ public class Avatar {
     public Avatar(TETile s, TETile[][] t) {
         this.skin = s;
         this.tiles = t;
-        initialize();
     }
 
-    private void initialize() {
+    public void initialize() {
         for (int i  = 0; i < tiles.length; i++) {
             for (int j  = 0; j < tiles[0].length; j++) {
                 if (movable(i, j)) {
+                    tiles[i][j] = this.skin;
                     move(new pair(i, j));
                     break;
                 }
@@ -27,7 +27,11 @@ public class Avatar {
         }
     }
 
-    public void move(pair pos) {
+    public void updateTiles(TETile[][] t) {
+        tiles = t;
+    }
+
+    private void move(pair pos) {
         this.position = pos;
     }
     private boolean movable(int x, int y) {
@@ -80,6 +84,10 @@ public class Avatar {
 
     public TETile getSkin() {
         return skin;
+    }
+
+    public TETile[][] getTiles() {
+        return tiles;
     }
 
     private record pair(int x, int y) {
