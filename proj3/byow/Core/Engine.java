@@ -28,6 +28,7 @@ public class Engine {
     private TETile[][] tiles;
     private Avatar person;
     private String userInput;
+    private String inputHistory = "";
     private boolean gameStart;
 
     public Engine() {
@@ -58,12 +59,13 @@ public class Engine {
      */
     public void interactWithKeyboard() {
         //menu
-        menu.drawMenu();
-
+        if (!gameStart) {
+            menu.drawMenu();
+        }
         //random seed
         String input = "";
         char c;
-        while (true) {
+        while (!gameStart) {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'q') { //quit
@@ -77,6 +79,7 @@ public class Engine {
                 } else { // new game
                     drawFrame("Enter a seed ending with s: " + input + c);
                     if (c == 's') {
+                        input = input + c;
                         break;
                     }
                     input = input + c;
@@ -84,32 +87,33 @@ public class Engine {
             }
         }
 
-        //game
-        gameStart = true;
-        input = input.toLowerCase();
-        userInput = input;
-        InputSource inputSource = new StringInputDevice(input);
-        String seeds = "";
-        while (inputSource.possibleNextInput()) {
-            char c1 = inputSource.getNextKey();
-            if (c1 == 'n') {
-                seeds = "";
-            } else if (c1 == 's') {
-                break;
-            } else {
-                seeds = seeds + c1;
+        //game random seed
+        if (!gameStart) {
+            input = input.toLowerCase();
+            userInput = input;
+            InputSource inputSource = new StringInputDevice(input);
+            String seeds = "";
+            while (inputSource.possibleNextInput()) {
+                char c1 = inputSource.getNextKey();
+                if (c1 == 'n') {
+                    seeds = "";
+                } else if (c1 == 's') {
+                    break;
+                } else {
+                    seeds = seeds + c1;
+                }
             }
+            SEED = Long.parseLong(seeds);
+            World w = new World(seeds, WIDTH, HEIGHT);
+            tiles = w.getTiles();
+
+            ter.initialize(WIDTH, HEIGHT);
+            ter.renderFrame(tiles, "");
+            tiles = person.initialize(tiles);
+            gameStart = true;
         }
-        SEED = Long.parseLong(seeds);
-        World w = new World(seeds, WIDTH, HEIGHT);
-        tiles = w.getTiles();
 
         String block = "";
-        ter.initialize(WIDTH, HEIGHT);
-        ter.renderFrame(tiles, block);
-        tiles = person.initialize(tiles);
-
-        input = "";
         //game start
         while (gameStart) {
             block = blockAt(ter);
@@ -129,15 +133,13 @@ public class Engine {
                     }
                 } else if (c == 'l') {
                     load();
-                } else {
-                    input += c;
                 }
-                if (input.equals(":q")) {
+                userInput += c;
+                if (userInput.contains(":q")) {
                     saveAndQuit();
                 }
             }
         }
-        userInput += input;
     }
 
     /**
@@ -179,13 +181,27 @@ public class Engine {
             load(); //gets seed
             movement = input;
         } else if (firstChar == 'n') { //new game
-            int seedEnd = input.indexOf('s');
-            seeds = input.substring(1, seedEnd - 1);
-            movement = input.substring(seedEnd);
+            int s = 0;
+            for (int i = 1; i < input.length(); i++) {
+                if (input.charAt(i) != 's') {
+                    seeds += input.charAt(i);
+                } else {
+                    s = i;
+                    break;
+                }
+            }
+            for (int i = s+1; i < input.length(); i++) {
+                if (input.charAt(i) == ':') {
+                    break;
+                } else {
+                    movement += input.charAt(i);
+                }
+
+            }
             SEED = Long.parseLong(seeds);
         }
 
-        World w = new World(Long.toString(SEED), WIDTH, HEIGHT);
+        World w = new World(seeds, WIDTH, HEIGHT);
         tiles = w.getTiles();
 
         String block = "";
@@ -224,13 +240,12 @@ public class Engine {
         if (line != null) {
             lineArray = line.split(",");
             SEED = Long.parseLong(lineArray[0]);
-            int avatarX = Integer.parseInt(lineArray[1]);
-            int avatarY = Integer.parseInt(lineArray[2]);
-            String savedUserInput = lineArray[3];
-            //  person.changePosition(avatarX, avatarY);
+            String savedUserInput = lineArray[1];
             tiles = interactWithInputString(savedUserInput);
             ter.renderFrame(tiles, "");
-            // tiles = person.move(); person position
+            gameStart = true;
+            userInput = "";
+            interactWithKeyboard();
         }
     }
 
@@ -246,22 +261,34 @@ public class Engine {
         if (line != null) {
             lineArray = line.split(",");
             SEED = Long.parseLong(lineArray[0]);
-            int avatarX = Integer.parseInt(lineArray[1]);
-            int avatarY = Integer.parseInt(lineArray[2]);
-            String input = lineArray[3];
+            String input = lineArray[1];
+
             input = input.toLowerCase();
             userInput = input;
             String seeds = "";
             String movement = "";
-
             char firstChar = input.charAt(0);
             if (firstChar == 'l') { //load
                 load(); //gets seed
                 movement = input;
             } else if (firstChar == 'n') { //new game
-                int seedEnd = input.indexOf('s');
-                seeds = input.substring(1, seedEnd - 1);
-                movement = input.substring(seedEnd);
+                int s = 0;
+                for (int i = 1; i < input.length(); i++) {
+                    if (input.charAt(i) != 's') {
+                        seeds += input.charAt(i);
+                    } else {
+                        s = i;
+                        break;
+                    }
+                }
+                for (int i = s+1; i < input.length(); i++) {
+                    if (input.charAt(i) == ':') {
+                        break;
+                    } else {
+                        movement += input.charAt(i);
+                    }
+
+                }
                 SEED = Long.parseLong(seeds);
             }
 
@@ -282,12 +309,15 @@ public class Engine {
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
                     avatarMove(c);
                     ter.renderFrame(tiles, block);
-                    //  StdDraw.pause(1000);
+                      StdDraw.pause(1000);
                 } else {
                     notValid = notValid + c;
                 }
             }
             ter.renderFrame(tiles, "");
+            StdDraw.pause(100);
+            gameStart = true;
+            userInput = "";
             interactWithKeyboard();
         }
     }
@@ -295,29 +325,29 @@ public class Engine {
     public void saveAndQuitForInputString() {
         Out out = new Out("savegame.txt");
         //seed, avatarX, avatarY, userInput
-        String saved = SEED + "," + person.getPositionX() + "," + person.getPositionY() + "," + userInput;
+        String saved = SEED +  "," + userInput;
         out.print(saved);
     }
 
     public void saveAndQuit() {
         Out out = new Out("savegame.txt");
         //seed, avatarX, avatarY, userInput
-        String saved = SEED + "," + person.getPositionX() + "," + person.getPositionY() + "," + userInput;
+        String saved = SEED +  "," + userInput;
         out.print(saved);
         System.exit(0);
     }
 
-    public static void main(String[] args) {
-        Engine engine = new Engine();
-        //engine.interactWithKeyboard();
-
-        //  TETile[][] t = engine.interactWithInputString("N92054114S:Q");
-        //   TETile[][] t = engine.interactWithInputString("N6647S");
-        TETile[][] t = engine.interactWithInputString("LWWWDDDSSAA");
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
-        ter.renderFrame(t, "");
-    }
+//    public static void main(String[] args) {
+//        Engine engine = new Engine();
+//        //engine.interactWithKeyboard();
+//
+//        //  TETile[][] t = engine.interactWithInputString("N92054114S:Q");
+//        //   TETile[][] t = engine.interactWithInputString("N6647S");
+//        TETile[][] t = engine.interactWithInputString("LWWWDDDSSAA");
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(WIDTH, HEIGHT);
+//        ter.renderFrame(t, "");
+//    }
 
     //@source lab13
     public void drawFrame(String s) {
