@@ -61,6 +61,8 @@ public class Engine {
                     load();
                 } else if (c == 'c') { //change avatar
                     person = new Avatar(Tileset.FLOWER, tiles);
+                } else if (c == 'r') {
+                    replayLastSave();
                 } else { // new game
                     drawFrame("Enter a seed ending with s: " + input);
                     if (c == 's') {
@@ -216,13 +218,13 @@ public class Engine {
 
     public void replayLastSave() {
         Path path = Paths.get("savegame.txt");
-
         if (!Files.exists(path)) {
             System.exit(0);
         }
         In in = new In(path.toFile());
         String line = in.readLine();
         String[] lineArray;
+
         if (line != null) {
             lineArray = line.split(",");
             SEED = Long.parseLong(lineArray[0]);
@@ -233,6 +235,7 @@ public class Engine {
             userInput = input;
             String seeds = "";
             String movement = "";
+
             char firstChar = input.charAt(0);
             if (firstChar == 'l') { //load
                 load(); //gets seed
@@ -261,14 +264,13 @@ public class Engine {
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
                     avatarMove(c);
                     ter.renderFrame(tiles, block);
+                    StdDraw.pause(1000);
                 } else {
                     notValid = notValid + c;
                 }
-                if (notValid.equals(":q")) {
-                    saveAndQuit();
-                }
             }
             ter.renderFrame(tiles, "");
+            interactWithKeyboard();
         }
     }
 
@@ -292,9 +294,9 @@ public class Engine {
         Engine engine = new Engine();
         //engine.interactWithKeyboard();
 
-        // TETile[][] t = engine.interactWithInputString("N92054114S");
+        //  TETile[][] t = engine.interactWithInputString("N92054114S:Q");
         //   TETile[][] t = engine.interactWithInputString("N6647S");
-        TETile[][] t = engine.interactWithInputString("LWWWDDD");
+        TETile[][] t = engine.interactWithInputString("LWWWDDDSSAA");
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         ter.renderFrame(t, "");
