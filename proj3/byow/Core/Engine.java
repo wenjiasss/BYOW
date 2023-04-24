@@ -1,19 +1,20 @@
 package byow.Core;
 
+import byow.InputDemo.InputSource;
+import byow.InputDemo.StringInputDevice;
+import byow.TileEngine.TERenderer;
+import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
+import byow.Core.World;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Out;
+import edu.princeton.cs.algs4.StdDraw;
+
 import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
-
-import byow.InputDemo.InputSource;
-import byow.InputDemo.StringInputDevice;
-import byow.TileEngine.TERenderer;
-import byow.TileEngine.TETile;
-import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.Out;
-import edu.princeton.cs.algs4.In;
-import byow.TileEngine.Tileset;
 
 
 public class Engine {

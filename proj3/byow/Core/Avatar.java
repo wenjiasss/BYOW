@@ -1,12 +1,11 @@
 package byow.Core;
 
-import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
 public class Avatar {
 
-    private TETile skin;
+    private final TETile skin;
     private coordinate position;
     private TETile[][] tiles;
 

@@ -1,27 +1,23 @@
 package byow.Core;
 
-import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class World {
-    private final ArrayList<pair> hallStart = new ArrayList<>();
-    private final ArrayList<pair> hallEnd = new ArrayList<>();
-    private final ArrayList<Integer> hallDirection = new ArrayList<>(); //0 = up, 2 = right
-    private final int stopChance = 2;
 
-    private final ArrayList<pair> LeftBottom = new ArrayList<>();
-    private final ArrayList<pair> RightTop = new ArrayList<>();
+    private static final int LENGTH_HALL = 20;
+    private static final int MIN_LENGTH = 15;
+    private final ArrayList<coordinate> leftEnds = new ArrayList<>();
+    private final ArrayList<coordinate> rightEnds = new ArrayList<>();
+    private final ArrayList<coordinate> upEnds = new ArrayList<>();
+    private final ArrayList<coordinate> downEnds = new ArrayList<>();
+    private final int w;
+    private final int h;
     private final Random RANDOM;
-    private TETile[][] tiles;
-    /* Feel free to change the width and height. */
-    public int w;
-    public int h;
-
+    private final TETile[][] tiles;
 
     public World(String seed, int width, int height) {
         Long s = Long.parseLong(seed);
@@ -30,311 +26,271 @@ public class World {
         this.h = height;
 
         int numHalls = RANDOM.nextInt(50, 80);
-        int curHalls = 0;
+        int numRooms = RANDOM.nextInt(10, 20);
+        int curHall = 0;
+        int curRooms = 0;
 
         tiles = new TETile[w][h];
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
-                tiles[i][j] = Tileset.NOTHING;
+                tiles[i][j] = Tileset.WALL;
             }
         }
 
-        while (curHalls <= numHalls) {
-            generateHall();
-            curHalls++;
-        }
-
-        for (int i = 0; i < hallDirection.size(); i++) {
-            generateRoom(i);
-        }
-
-        breakWalls b = new breakWalls(tiles);
-        this.tiles = b.getTiles();
-    }
+        int firstX = RANDOM.nextInt(5, w - 5);
+        int firstY = RANDOM.nextInt(5, h - 5);
+        coordinate coordinate = new coordinate(firstX, firstY);
+        leftEnds.add(coordinate);
+        rightEnds.add(coordinate);
+        upEnds.add(coordinate);
+        downEnds.add(coordinate);
 
 
-    private void generateHall() {
-        // generate start point using RANDOM
-        int startx = RANDOM.nextInt(7, w - 6);
-        int starty = RANDOM.nextInt(7, h - 6);
-        pair start = new pair(startx, starty);
-        // generate direction hallway continues using RANDOM
-        int direction = RANDOM.nextInt(0, 4); // 0=up, 1=down, 2=right, 3=left
-        // generate end point
-        int endx = startx;
-        int endy = starty;
-        if (direction <= 1) {
-            int lenUp = h - 5 - starty;
-            int lenDown = starty - 5;
-            if (lenUp >= lenDown) {
-                endy = h - 5;
-                direction = 0;
-            } else {
-                endy = 5;
-                direction = 1;
-            }
-        } else {
-            int lenRight = w - 5 - startx;
-            int lenLeft = startx - 5;
-            if (lenRight >= lenLeft) {
-                endx = w - 5;
-                direction = 2;
-            } else {
-                endx = 5;
-                direction = 3;
-            }
-        }
-        pair end = new pair(endx, endy);
-        // Turn downward/leftward hallways into upward/rightward hallways
-        if (direction == 1 || direction == 3) {
-            pair a = start;
-            start = end;
-            end = a;
-            direction = direction - 1;
-        }
-        // create this hallway on tiles if this hallway is seperate from other hallways
-        if (seperateHall(start, direction)) {
-            createHall(start, end, direction);
-        }
-    }
-
-    // HALLS FUCTIONS
-    // create the hallway on tiles
-    private void createHall(pair start, pair end, int direction) {
-        int stop = 0;
-        int x = start.x();
-        int y = start.y();
-
-        // Upward Hallways
-        if (direction == 0) { // up --> same x
-            int a = y + 1;
-            // create start wall based on condition
-            if (tiles[x][y] == Tileset.NOTHING) {
-                tiles[x - 1][y] = Tileset.WALL;
-                tiles[x][y] = Tileset.WALL;
-                tiles[x + 1][y] = Tileset.WALL;
-            } else if (tiles[x][y] == Tileset.WALL && tiles[x][y + 1] == Tileset.FLOOR) {
-                tiles[x][y + 2] = Tileset.FLOOR;
-                a = a + 2;
-            }
-            // create middle section of hallway
-            for (int i = a; i < end.y(); i++) {
-                if (tiles[x][i] == Tileset.WALL) {
-                    stop = RANDOM.nextInt(0, stopChance); //1 = stop
-                    if (tiles[x][i + 1] == Tileset.WALL) {
-                        if (tiles[x - 1][i] == Tileset.NOTHING) {
-                            tiles[x - 1][i] = Tileset.WALL;
-                            tiles[x - 1][i + 1] = Tileset.WALL;
-                            tiles[x - 1][i + 2] = Tileset.WALL;
-                        } else if (tiles[x + 1][i] == Tileset.NOTHING) {
-                            tiles[x + 1][i] = Tileset.WALL;
-                            tiles[x + 1][i + 1] = Tileset.WALL;
-                            tiles[x + 1][i + 2] = Tileset.WALL;
-                        }
-                        tiles[x][i] = Tileset.FLOOR;
-                        tiles[x][i + 1] = Tileset.FLOOR;
-                    } else {
-                        tiles[x][i] = Tileset.FLOOR;
-                    }
-                    if (stop == 1) {
-                        end = new pair(x, i + 2);
-                        break;
-                    } else {
-                        tiles[x][i + 2] = Tileset.FLOOR;
-                        i = i + 2;
-                    }
-                } else {
-                    tiles[x - 1][i] = Tileset.WALL;
-                    tiles[x][i] = Tileset.FLOOR;
-                    tiles[x + 1][i] = Tileset.WALL;
+        while (curHall <= numHalls) {
+            int d = RANDOM.nextInt(4);
+            if (d == 0 && rightEnds.size() != 0) {
+                coordinate start = rightEnds.get(RANDOM.nextInt(rightEnds.size()));
+                if (HorizontalHall(1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
+                    rightEnds.remove(start);
+                    curHall++;
                 }
-            }
-            // if did not stop during the middle, create an end wall
-            if (stop != 1) {
-                tiles[x - 1][end.y()] = Tileset.WALL;
-                tiles[x][end.y()] = Tileset.WALL;
-                tiles[x + 1][end.y()] = Tileset.WALL;
-            }
-        }
-
-        // Rightward Hallways
-        else if (direction == 2) { // right --> same y
-            int a = x + 1;
-            // create start wall based on condition
-            if (tiles[x][y] == Tileset.NOTHING) {
-                tiles[x][y - 1] = Tileset.WALL;
-                tiles[x][y] = Tileset.WALL;
-                tiles[x][y + 1] = Tileset.WALL;
-            } else if (tiles[x][y] == Tileset.WALL && tiles[x + 1][y] == Tileset.FLOOR) {
-                tiles[x + 2][y] = Tileset.FLOOR;
-                a = a + 2;
-            }
-            // create middle section of hallway
-            for (int i = a; i < end.x(); i++) {
-                if (tiles[i][y] == Tileset.WALL) {
-                    stop = RANDOM.nextInt(0, stopChance); //1 = stop
-                    if (tiles[i + 1][y] == Tileset.WALL) {
-                        if (tiles[i][y - 1] == Tileset.NOTHING) {
-                            tiles[i][y - 1] = Tileset.WALL;
-                            tiles[i + 1][y - 1] = Tileset.WALL;
-                            tiles[i + 2][y - 1] = Tileset.WALL;
-                        } else if (tiles[i][y + 1] == Tileset.NOTHING) {
-                            tiles[i][y + 1] = Tileset.WALL;
-                            tiles[i + 1][y + 1] = Tileset.WALL;
-                            tiles[i + 2][y + 1] = Tileset.WALL;
-                        }
-                        tiles[i][y] = Tileset.FLOOR;
-                        tiles[i + 1][y] = Tileset.FLOOR;
-                    } else {
-                        tiles[i][y] = Tileset.FLOOR;
-                    }
-                    if (stop == 1) {
-                        end = new pair(i + 2, y);
-                        break;
-                    } else {
-                        tiles[i + 2][y] = Tileset.FLOOR;
-                        i = i + 2;
-                    }
-                } else {
-                    tiles[i][y - 1] = Tileset.WALL;
-                    tiles[i][y] = Tileset.FLOOR;
-                    tiles[i][y + 1] = Tileset.WALL;
+            } else if (d == 1 && leftEnds.size() != 0) {
+                coordinate start = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
+                if (HorizontalHall(-1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
+                    leftEnds.remove(start);
+                    curHall++;
                 }
-            }
-            // if did not stop during the middle, create an end wall
-            if (stop != 1) {
-                tiles[end.x()][y - 1] = Tileset.WALL;
-                tiles[end.x()][y] = Tileset.WALL;
-                tiles[end.x()][y + 1] = Tileset.WALL;
-            }
-        }
-        // add parameters into ArrayLists
-        hallStart.add(start);
-        hallEnd.add(end);
-        hallDirection.add(direction);
-    }
-
-    // Check if this hallway is seperate from all existing hallways that go in same direction
-    private boolean seperateHall(pair start, int direction) {
-        boolean result = true;
-        if (direction <= 1) { // check x
-            for (int i = 0; i < hallDirection.size(); i++) {
-                if (hallDirection.get(i) <= 1) {
-                    int p = hallStart.get(i).x();
-                    if (p - 3 <= start.x() && start.x() <= p + 3) {
-                        result = false;
-                    }
+            } else if (d == 2 && upEnds.size() != 0) {
+                coordinate start = upEnds.get(RANDOM.nextInt(upEnds.size()));
+                if (VerticalHall(1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
+                    upEnds.remove(start);
+                    curHall++;
                 }
-            }
-        } else { // check y
-            for (int i = 0; i < hallDirection.size(); i++) {
-                if (hallDirection.get(i) >= 2) {
-                    int p = hallStart.get(i).y();
-                    if (p - 3 <= start.y() && start.y() <= p + 3) {
-                        result = false;
-                    }
+            } else if (d == 3 && downEnds.size() != 0) {
+                coordinate start = downEnds.get(RANDOM.nextInt(downEnds.size()));
+                if (VerticalHall(-1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
+                    downEnds.remove(start);
+                    curHall++;
                 }
             }
         }
-        return result;
+
+        while (curRooms <= numRooms) {
+            int d = RANDOM.nextInt(4);
+            coordinate p = null;
+            if (d == 0 && rightEnds.size() != 0) {
+                p = rightEnds.get(RANDOM.nextInt(rightEnds.size()));
+                if (createRoom(p)) {
+                    rightEnds.remove(p);
+                    curRooms++;
+                }
+            } else if (d == 1 && leftEnds.size() != 0) {
+                p = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
+                if (createRoom(p)) {
+                    leftEnds.remove(p);
+                    curRooms++;
+                }
+            } else if (d == 2 && upEnds.size() != 0) {
+                p = upEnds.get(RANDOM.nextInt(upEnds.size()));
+                if (createRoom(p)) {
+                    upEnds.remove(p);
+                    curRooms++;
+                }
+            } else if (d == 3 && downEnds.size() != 0) {
+                p = downEnds.get(RANDOM.nextInt(downEnds.size()));
+                if (createRoom(p)) {
+                    downEnds.remove(p);
+                    curRooms++;
+                }
+            }
+        }
+        breakWalls();
     }
 
-
-    // ROOM FUNCTIONS
-    // generate Rooms on start and end of vertical hallways
-    private void generateRoom(int index) {
-        pair start = hallStart.get(index);
-        pair end = hallEnd.get(index);
-
-        int yes = RANDOM.nextInt(0, 2); // 0 = don't generate room, 1 = generate room
-        if (yes == 1) {
-            helper(start);
-        }
-
-        yes = RANDOM.nextInt(0, 2);
-        if (yes == 1) {
-            helper(end);
-        }
-    }
-
-    private void helper(pair original) {
-        int width = RANDOM.nextInt(1, 7);
-        int height = RANDOM.nextInt(1, 7);
-        int xchange;
-        int ychange;
-
-
-        int a1 = Math.min(w - 3 - original.x(), original.x() - 3);
-        if (a1 == original.x() - 3) {
-            xchange = RANDOM.nextInt(0, Math.min(a1, width));
-        } else {
-            xchange = width - RANDOM.nextInt(0, Math.min(a1, width));
-        }
-
-        int a2 = Math.min(h - 3 - original.y(), original.y() - 3);
-        if (a2 == original.y() - 3) {
-            ychange = RANDOM.nextInt(0, Math.min(a2, height));
-        } else {
-            ychange = height - RANDOM.nextInt(0, Math.min(a2, height));
-        }
-
-        int startx = original.x() - xchange;
-        int starty = original.y() - ychange;
-        pair roomStart = new pair(startx, starty); // left bottom
-
-        int endx = startx + width;
-        int endy = starty + height;
-        pair roomEnd = new pair(endx, endy); // top right
-
-        //check for overlap
-        if (!overlap(roomStart, roomEnd)) {
-            createRoom(roomStart, roomEnd);
-            LeftBottom.add(roomStart);
-            RightTop.add(roomEnd);
+    private void breakWalls() {
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                if (uselessWall(i, j)) {
+                    tiles[i][j] = Tileset.NOTHING;
+                }
+            }
         }
     }
 
+    private boolean uselessWall(int x, int y) {
+        for (int i = x - 1; i < x + 2; i++) {
+            for (int j = y - 1; j < y + 2; j++) {
+                if (isValid(i, j) && tiles[i][j] == Tileset.FLOOR) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-    //draws it on the tiles
-    private void createRoom(pair start, pair end) {
-        for (int i = start.x(); i <= end.x(); i++) {
-            for (int j = start.y(); j <= end.y(); j++) {
+    private Boolean createRoom(coordinate p) {
+        int roomWidth1 = RANDOM.nextInt(1, 5);
+        int roomHeight1 = RANDOM.nextInt(1, 4);
+        int roomWidth2 = RANDOM.nextInt(1, 5);
+        int roomHeight2 = RANDOM.nextInt(1, 4);
+
+        coordinate start = new coordinate(p.x() - roomWidth1, p.y() - roomHeight1);
+        coordinate end = new coordinate(p.x() + roomWidth2, p.y() + roomHeight2);
+
+        if (!isValid(start) || !isValid(end)) {
+            return false;
+        }
+
+        for (int i = start.x(); i < end.x(); i++) {
+            for (int j = end.y(); j < start.y(); j++) {
                 tiles[i][j] = Tileset.FLOOR;
             }
         }
-        for (int i = start.x() - 1; i <= end.x() + 1; i++) {
-            tiles[i][start.y() - 1] = Tileset.WALL;
-            tiles[i][end.y() + 1] = Tileset.WALL;
-        }
-        for (int j = start.y() - 1; j <= end.y() + 1; j++) {
-            tiles[start.x() - 1][j] = Tileset.WALL;
-            tiles[end.x() + 1][j] = Tileset.WALL;
-        }
+
+        return true;
     }
 
-    //check if randomly generated room overlaps with previous room in leftbottom and rightop
-    public boolean overlap(pair start, pair end) {
-        if (LeftBottom != null && RightTop != null) {
-            //creates rectangle for randomly generated room
-            Rectangle r1 = new Rectangle(start.x(), start.y(), end.x() - start.x(), end.y() - start.y());
-            for (int i = 0; i < LeftBottom.size(); i++) {
-                pair l = LeftBottom.get(i);
-                pair r = RightTop.get(i);
-                int oldLength = Math.abs(l.y - r.y);
-                int oldWidth = Math.abs(l.x - r.x);
-                Rectangle r2 = new Rectangle(l.x() - 1, l.y() - 1, oldWidth + 1, oldLength + 1);
-                if (r2.intersects(r1)) {
-                    return true;
-                }
+    private Boolean HorizontalHall(int direction, coordinate start, int length) {
+        int x = start.x();
+        int y = start.y();
+        if (!isValid(new coordinate(x + direction * length, y))) {
+            return false;
+        }
+
+        if (direction == 1 && !isValidEnd(x, y, "right")) {
+            rightEnds.remove(start);
+            return false;
+        } else if (direction == -1 && !isValidEnd(x, y, "left")) {
+            leftEnds.remove(start);
+            return false;
+        }
+
+        for (int i = 0; i < length; i++) {
+            tiles[x][y] = Tileset.FLOOR;
+            x += direction;
+        }
+
+        int diverge = RANDOM.nextInt(2);
+        if (length >= MIN_LENGTH && diverge == 1) {
+            int midX = start.x() + direction * RANDOM.nextInt(3, length - 3);
+            if (isValidEnd(midX, y, "down")) {
+                downEnds.add(new coordinate(midX, y));
+            }
+            if (isValidEnd(midX, y, "up")) {
+                upEnds.add(new coordinate(midX, y));
             }
         }
-        return false;
+
+        x = x - direction;
+        if (direction == 1) {
+            if (isValidEnd(x, y, "right")) {
+                rightEnds.add(new coordinate(x, y));
+            }
+        } else {
+            if (isValidEnd(x, y, "left")) {
+                leftEnds.add(new coordinate(x, y));
+            }
+        }
+        if (isValidEnd(x, y, "up")) {
+            upEnds.add(new coordinate(x, y));
+        }
+        if (isValidEnd(x, y, "down")) {
+            downEnds.add(new coordinate(x, y));
+        }
+
+        return true;
+    }
+
+    private Boolean VerticalHall(int direction, coordinate start, int length) {
+        int x = start.x();
+        int y = start.y();
+
+        if (!isValid(new coordinate(x, y + direction * length))) {
+            return false;
+        }
+
+        if (direction == 1 && !isValidEnd(x, y, "up")) {
+            upEnds.remove(start);
+            return false;
+        } else if (!isValidEnd(x, y, "down")) {
+            downEnds.remove(start);
+            return false;
+        }
+
+        for (int i = 0; i < length; i++) {
+            tiles[x][y] = Tileset.FLOOR;
+            y += direction;
+        }
+
+        int midornot = RANDOM.nextInt(2);
+        if (length >= MIN_LENGTH && midornot == 1) {
+            int midY = start.y() + direction * RANDOM.nextInt(3, length - 3);
+            if (isValidEnd(x, midY, "left")) {
+                leftEnds.add(new coordinate(x, midY));
+            }
+            if (isValidEnd(x, midY, "right")) {
+                rightEnds.add(new coordinate(x, midY));
+            }
+        }
+
+        y = y - direction;
+        if (direction == 1) {
+            if (isValidEnd(x, y, "up")) {
+                upEnds.add(new coordinate(x, y));
+            }
+        } else {
+            if (isValidEnd(x, y, "down")) {
+                downEnds.add(new coordinate(x, y));
+            }
+        }
+        if (isValidEnd(x, y, "left")) {
+            leftEnds.add(new coordinate(x, y));
+        }
+        if (isValidEnd(x, y, "right")) {
+            rightEnds.add(new coordinate(x, y));
+        }
+        return true;
+    }
+
+    private Boolean isValid(int x, int y) {
+        return 0 < x && x < w - 1 && 0 < y && y < h - 1;
+    }
+
+    private Boolean isValid(coordinate p) {
+        return isValid(p.x(), p.y());
+    }
+
+    private Boolean isValidEnd(int x, int y, String direction) {
+        int changeX = 0;
+        int changeY = 0;
+        if (direction.equals("left")) {
+            if (tiles[x - 1][y + 1] == Tileset.FLOOR && tiles[x - 2][y + 1] == Tileset.FLOOR) {
+                return false;
+            }
+            return tiles[x - 1][y - 1] != Tileset.FLOOR || tiles[x - 2][y - 1] != Tileset.FLOOR;
+        } else if (direction.equals("right")) {
+            if (tiles[x + 1][y + 1] == Tileset.FLOOR && tiles[x + 2][y + 1] == Tileset.FLOOR) {
+                return false;
+            }
+            return tiles[x + 1][y - 1] != Tileset.FLOOR || tiles[x + 2][y - 1] != Tileset.FLOOR;
+        } else if (direction.equals("up")) {
+            if (tiles[x - 1][y + 1] == Tileset.FLOOR && tiles[x - 1][y + 2] == Tileset.FLOOR) {
+                return false;
+            }
+            return tiles[x + 1][y + 1] != Tileset.FLOOR || tiles[x + 1][y + 2] != Tileset.FLOOR;
+        } else if (direction.equals("down")) {
+            if (tiles[x - 1][y - 1] == Tileset.FLOOR && tiles[x - 1][y - 2] == Tileset.FLOOR) {
+                return false;
+            }
+            return tiles[x + 1][y - 1] != Tileset.FLOOR || tiles[x + 1][y - 2] != Tileset.FLOOR;
+        }
+        return true;
     }
 
     public TETile[][] getTiles() {
         return tiles;
     }
 
-    private record pair(int x, int y) {
+    private record coordinate(int x, int y) {
     }
 }
