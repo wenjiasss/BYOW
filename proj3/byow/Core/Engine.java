@@ -188,17 +188,6 @@ public class Engine {
                 saveAndQuitForInputString();
             }
         }
-////        TERenderer r = new TERenderer();
-////        r.initialize(82, 32, 1, 1);
-////        r.renderFrame(...);
-//        tiles = person.initialize(tiles);
-//        while (inputSource.possibleNextInput()) {
-//            //block = blockAt(r);
-//            //r.renderFrame1(...);
-//            char c = inputSource.getNextKey();
-//            AvatarMove(c);
-//            ter.renderFrame(tiles, "");
-//        }
         return tiles;
     }
 
@@ -239,10 +228,47 @@ public class Engine {
             SEED = Long.parseLong(lineArray[0]);
             int avatarX = Integer.parseInt(lineArray[1]);
             int avatarY = Integer.parseInt(lineArray[2]);
-            String savedUserInput = lineArray[3];
+            String input = lineArray[3];
+            input = input.toLowerCase();
+            userInput = input;
+            String seeds = "";
+            String movement = "";
+            char firstChar = input.charAt(0);
+            if (firstChar == 'l') { //load
+                load(); //gets seed
+                movement = input.substring(0);
+            } else if (firstChar == 'n') { //new game
+                int seedEnd = input.indexOf('s');
+                seeds = input.substring(1, seedEnd - 1);
+                movement = input.substring(seedEnd);
+                SEED = Long.parseLong(seeds);
+            }
 
+            World w = new World(Long.toString(SEED), WIDTH, HEIGHT);
+            tiles = w.getTiles();
+
+            String block = "";
+            ter.initialize(WIDTH, HEIGHT);
+            ter.renderFrame(tiles, block);
+            tiles = person.initialize(tiles);
+
+            String notValid = "";
+            InputSource inputSource = new StringInputDevice(movement);
+            while (inputSource.possibleNextInput()) {
+                char c = inputSource.getNextKey();
+                block = blockAt(ter);
+                ter.renderFrame(tiles, block);
+                if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
+                    avatarMove(c);
+                    ter.renderFrame(tiles, block);
+                } else {
+                    notValid = notValid + c;
+                }
+                if (notValid.equals(":q")) {
+                    saveAndQuit();
+                }
+            }
             ter.renderFrame(tiles, "");
-
         }
     }
 
