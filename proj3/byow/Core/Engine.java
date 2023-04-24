@@ -21,7 +21,6 @@ public class Engine {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
     private final Menu menu;
-    private final boolean fullView = false;
     TERenderer ter = new TERenderer();
     private long SEED;
     private Random RANDOM;
@@ -30,6 +29,7 @@ public class Engine {
     private String userInput;
     private String inputHistory = "";
     private boolean gameStart;
+    private boolean fullView = false;
 
     public Engine() {
         tiles = new TETile[WIDTH][HEIGHT];
@@ -133,6 +133,8 @@ public class Engine {
                     }
                 } else if (c == 'l') {
                     load();
+                } else if (c == 'v') {
+                    fullView = !fullView;
                 }
                 userInput += c;
                 if (userInput.contains(":q")) {

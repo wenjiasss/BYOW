@@ -101,7 +101,7 @@ public class TERenderer {
         }
         StdDraw.setPenColor(Color.WHITE);
         StdDraw.text(7, height - 2, "you see " + block);
-        StdDraw.text(width - 15, height - 2, "press :Q to save and quit");
+        StdDraw.text(width - 15, height - 2, "press :Q to save and quit    press v to turn full view on/off");
         StdDraw.show();
     }
 
