@@ -9,9 +9,6 @@ public class Avatar {
     private coordinate position;
     private TETile[][] tiles;
 
-    //public static final TETile PERSON = new TETile('@', Color.white, Color.black, "you", Paths.get("byow", "img", "person.png").toString());
-    //  public static final TETile CAT = new TETile('$', Color.white, Color.black, "you", Paths.get("byow", "img", "cat.png").toString());
-
     public Avatar(TETile s, TETile[][] t) {
         this.skin = s;
         this.tiles = t;
@@ -23,7 +20,7 @@ public class Avatar {
             for (int j = 0; j < tiles[0].length; j++) {
                 if (movable(i, j)) {
                     tiles[i][j] = this.skin;
-                    move(new coordinate(i, j));
+                    this.position = new coordinate(i, j);
                     break;
                 }
             }

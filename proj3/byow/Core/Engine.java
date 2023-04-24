@@ -161,13 +161,10 @@ public class Engine {
             seeds = input.substring(1, seedEnd - 1);
             movement = input.substring(seedEnd);
             SEED = Long.parseLong(seeds);
-            World w = new World(Long.toString(SEED), WIDTH, HEIGHT);
-            tiles = w.getTiles();
         }
 
         String block = "";
         ter.initialize(WIDTH, HEIGHT);
-        block = blockAt(ter);
         ter.renderFrame(tiles, block);
         tiles = person.initialize(tiles);
 
@@ -175,6 +172,8 @@ public class Engine {
         InputSource inputSource = new StringInputDevice(movement);
         while (inputSource.possibleNextInput()) {
             char c = inputSource.getNextKey();
+            block = blockAt(ter);
+            ter.renderFrame(tiles, block);
             if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
                 avatarMove(c);
                 ter.renderFrame(tiles, block);
@@ -185,7 +184,6 @@ public class Engine {
                 saveAndQuit();
             }
         }
-
 ////        TERenderer r = new TERenderer();
 ////        r.initialize(82, 32, 1, 1);
 ////        r.renderFrame(...);
@@ -240,6 +238,7 @@ public class Engine {
             String savedUserInput = lineArray[3];
 
 
+
             ter.renderFrame(tiles, "");
             // tiles = person.move(); person position
 
@@ -260,8 +259,8 @@ public class Engine {
         //engine.interactWithKeyboard();
 
         // TETile[][] t = engine.interactWithInputString("N92054114S");
-        // TETile[][] t = engine.interactWithInputString("N6647S");
-        TETile[][] t = engine.interactWithInputString("N999SDDD:Q");
+      //   TETile[][] t = engine.interactWithInputString("N6647S");
+       TETile[][] t = engine.interactWithInputString("L:Q");
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         ter.renderFrame(t, "");

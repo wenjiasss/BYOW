@@ -101,7 +101,7 @@ public class TERenderer {
         }
         StdDraw.setPenColor(Color.WHITE);
         StdDraw.text(7, height - 2, "you see " + block);
-        StdDraw.text(width - 15, height - 2, "press :Q to quit    press C to change avatar skin");
+        StdDraw.text(width - 15, height - 2, "press :Q to save and quit");
         StdDraw.show();
     }
 
