@@ -5,8 +5,8 @@ import edu.princeton.cs.algs4.StdDraw;
 import java.awt.*;
 
 public class Menu {
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     public Menu(int width, int height) {
         this.width = width;

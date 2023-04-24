@@ -87,6 +87,14 @@ public class Avatar {
         return Integer.toString(position.y());
     }
 
+    public int getPosition1() {
+        return position.x();
+    }
+
+    public int getPosition2() {
+        return position.y();
+    }
+
     public void changePosition(int x, int y) {
         coordinate c = new coordinate(x, y);
         if (movable(x, y)) {

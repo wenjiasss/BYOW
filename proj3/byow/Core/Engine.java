@@ -17,18 +17,17 @@ import java.util.Random;
 
 
 public class Engine {
-    TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    private final Menu menu;
+    private final boolean fullView = false;
+    TERenderer ter = new TERenderer();
     private long SEED;
     private Random RANDOM;
     private TETile[][] tiles;
-    private World world;
-    private Menu menu;
     private Avatar person;
     private String userInput;
-
     private boolean gameStart;
 
     public Engine() {
@@ -36,6 +35,18 @@ public class Engine {
         person = new Avatar(Tileset.AVATAR, tiles);
         menu = new Menu(WIDTH, HEIGHT);
         gameStart = false;
+    }
+
+    public static void main(String[] args) {
+        Engine engine = new Engine();
+        //engine.interactWithKeyboard();
+
+        // TETile[][] t = engine.interactWithInputString("N92054114S");
+        //   TETile[][] t = engine.interactWithInputString("N6647S");
+        TETile[][] t = engine.interactWithInputString("LWWWDDD");
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+        ter.renderFrame(t, "");
     }
 
     /**
@@ -100,12 +111,20 @@ public class Engine {
         //game start
         while (gameStart) {
             block = blockAt(ter);
-            ter.renderFrame(tiles, block);
+            if (!fullView) {
+                ter.renderFrame(getSight(), block);
+            } else {
+                ter.renderFrame(tiles, block);
+            }
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
                     avatarMove(c);
-                    ter.renderFrame(tiles, block);
+                    if (!fullView) {
+                        ter.renderFrame(getSight(), block);
+                    } else {
+                        ter.renderFrame(tiles, block);
+                    }
                 } else if (c == 'l') {
                     load();
                 } else {
@@ -156,7 +175,7 @@ public class Engine {
         char firstChar = input.charAt(0);
         if (firstChar == 'l') { //load
             load(); //gets seed
-            movement = input.substring(0);
+            movement = input;
         } else if (firstChar == 'n') { //new game
             int seedEnd = input.indexOf('s');
             seeds = input.substring(1, seedEnd - 1);
@@ -190,7 +209,6 @@ public class Engine {
         }
         return tiles;
     }
-
 
     public void load() {
         Path path = Paths.get("savegame.txt");
@@ -236,7 +254,7 @@ public class Engine {
             char firstChar = input.charAt(0);
             if (firstChar == 'l') { //load
                 load(); //gets seed
-                movement = input.substring(0);
+                movement = input;
             } else if (firstChar == 'n') { //new game
                 int seedEnd = input.indexOf('s');
                 seeds = input.substring(1, seedEnd - 1);
@@ -272,7 +290,6 @@ public class Engine {
         }
     }
 
-
     public void saveAndQuitForInputString() {
         Out out = new Out("savegame.txt");
         //seed, avatarX, avatarY, userInput
@@ -288,18 +305,6 @@ public class Engine {
         System.exit(0);
     }
 
-    public static void main(String[] args) {
-        Engine engine = new Engine();
-        //engine.interactWithKeyboard();
-
-        // TETile[][] t = engine.interactWithInputString("N92054114S");
-        //   TETile[][] t = engine.interactWithInputString("N6647S");
-        TETile[][] t = engine.interactWithInputString("LWWWDDD");
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
-        ter.renderFrame(t, "");
-    }
-
     //@source lab13
     public void drawFrame(String s) {
         /* Take the input string S and display it at the center of the screen,
@@ -308,7 +313,7 @@ public class Engine {
         StdDraw.setPenColor(Color.WHITE);
         Font fontBig = new Font("Monaco", Font.BOLD, HEIGHT);
         StdDraw.setFont(fontBig);
-        StdDraw.text(this.WIDTH / 2, this.HEIGHT / 2, s);
+        StdDraw.text(WIDTH / 2, HEIGHT / 2, s);
         StdDraw.show();
     }
 
@@ -345,5 +350,19 @@ public class Engine {
         }
     }
 
+
+    private TETile[][] getSight() {
+        TETile[][] sight = new TETile[WIDTH][HEIGHT];
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT; j++) {
+                if (!(Math.abs(person.getPosition1() - i) < 6 && Math.abs(person.getPosition2() - j) < 6)) {
+                    sight[i][j] = Tileset.NOTHING;
+                } else {
+                    sight[i][j] = tiles[i][j];
+                }
+            }
+        }
+        return sight;
+    }
 
 }
