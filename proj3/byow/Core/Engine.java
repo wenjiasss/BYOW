@@ -1,8 +1,6 @@
 package byow.Core;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,13 +13,7 @@ import byow.TileEngine.TETile;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.Out;
 import edu.princeton.cs.algs4.In;
-
-
-import byow.TileEngine.TERenderer;
-import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
-
-import byow.Core.Avatar;
 
 
 public class Engine {
@@ -112,7 +104,7 @@ public class Engine {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
-                    AvatarMove(c);
+                    avatarMove(c);
                     ter.renderFrame(tiles, block);
                 } else if (c == 'l') {
                     load();
@@ -183,7 +175,7 @@ public class Engine {
         while (inputSource.possibleNextInput()) {
             char c = inputSource.getNextKey();
             if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
-                AvatarMove(c);
+                avatarMove(c);
                 ter.renderFrame(tiles, block);
             } else {
                 notValid = notValid + c;
@@ -270,7 +262,7 @@ public class Engine {
         // TETile[][] t = engine.interactWithInputString("N6647S");
         TETile[][] t = engine.interactWithInputString("N999SDDD:Q");
         TERenderer ter = new TERenderer();
-        ter.initialize(80, 40);
+        ter.initialize(WIDTH, HEIGHT);
         ter.renderFrame(t, "");
     }
 
@@ -280,21 +272,8 @@ public class Engine {
          * with the pen settings given below. */
         StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.WHITE);
-        Font fontBig = new Font("Monaco", Font.BOLD, 30);
+        Font fontBig = new Font("Monaco", Font.BOLD, HEIGHT);
         StdDraw.setFont(fontBig);
-        StdDraw.text(this.WIDTH / 2, this.HEIGHT / 2, s);
-        StdDraw.show();
-    }
-
-    //doesn't work
-    public void displayHUD() {
-        StdDraw.clear(Color.BLACK);
-        //      StdDraw.filledRectangle(WIDTH, HEIGHT, WIDTH - 10, HEIGHT - 10);
-        StdDraw.setPenColor(Color.WHITE);
-        Font fontBig = new Font("Monaco", Font.BOLD, 20);
-        StdDraw.setFont(fontBig);
-        // String s = "Tile: " + blockAt(ter);
-        String s = "Tile: ";
         StdDraw.text(this.WIDTH / 2, this.HEIGHT / 2, s);
         StdDraw.show();
     }
@@ -306,7 +285,7 @@ public class Engine {
 //        int x = (int) StdDraw.mouseX();
 //        int y = (int) StdDraw.mouseY();
 
-        if (x < 0 || x >= 80 || y < 0 || y >= 30) {
+        if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
             return "nothing";
         }
         TETile tile = tiles[x][y];
@@ -320,7 +299,7 @@ public class Engine {
         return "nothing";
     }
 
-    private void AvatarMove(char c) {
+    private void avatarMove(char c) {
         if (c == 'w' || c == 'W') {
             tiles = person.moveUp();
         }
