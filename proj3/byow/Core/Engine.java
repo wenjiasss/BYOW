@@ -58,12 +58,13 @@ public class Engine {
      */
     public void interactWithKeyboard() {
         //menu
-        menu.drawMenu();
-
+        if(!gameStart) {
+            menu.drawMenu();
+        }
         //random seed
         String input = "";
         char c;
-        while (true) {
+        while (!gameStart) {
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'q') { //quit
@@ -224,13 +225,14 @@ public class Engine {
         if (line != null) {
             lineArray = line.split(",");
             SEED = Long.parseLong(lineArray[0]);
-            int avatarX = Integer.parseInt(lineArray[1]);
-            int avatarY = Integer.parseInt(lineArray[2]);
+//            int avatarX = Integer.parseInt(lineArray[1]);
+//            int avatarY = Integer.parseInt(lineArray[2]);
             String savedUserInput = lineArray[3];
             //  person.changePosition(avatarX, avatarY);
             tiles = interactWithInputString(savedUserInput);
             ter.renderFrame(tiles, "");
-            // tiles = person.move(); person position
+            gameStart = true;
+            interactWithKeyboard();
         }
     }
 
@@ -282,12 +284,13 @@ public class Engine {
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
                     avatarMove(c);
                     ter.renderFrame(tiles, block);
-                    //  StdDraw.pause(1000);
+                      StdDraw.pause(1000);
                 } else {
                     notValid = notValid + c;
                 }
             }
             ter.renderFrame(tiles, "");
+            StdDraw.pause(100);
             interactWithKeyboard();
         }
     }

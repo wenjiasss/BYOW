@@ -30,7 +30,7 @@ public class Menu {
         StdDraw.text(this.width / 2, this.height / 2, "The Game");
 
         //menu
-        Font fontSmall = new Font("Monaco", Font.BOLD, 30);
+        Font fontSmall = new Font("Monaco", Font.BOLD, 20);
         StdDraw.setFont(fontSmall);
         StdDraw.text(this.width / 2, this.height / 2 + 10, " \"New Game (N)\" \"Load Game (L)\" \"Quit (Q)\" \"Change Avatar (C)\" \"Replay (R)\"");
 
