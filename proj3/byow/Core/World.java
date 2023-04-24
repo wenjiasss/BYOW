@@ -8,8 +8,8 @@ import java.util.Random;
 
 public class World {
 
-    private static final int LENGTH_HALL = 20;
-    private static final int MIN_LENGTH = 15;
+    private static final int LENGTH_HALL = 15;
+    private static final int MIN_LENGTH = 9;
     private final ArrayList<coordinate> leftEnds = new ArrayList<>();
     private final ArrayList<coordinate> rightEnds = new ArrayList<>();
     private final ArrayList<coordinate> upEnds = new ArrayList<>();
@@ -25,7 +25,7 @@ public class World {
         this.w = width;
         this.h = height;
 
-        int numHalls = RANDOM.nextInt(50, 80);
+        int numHalls = RANDOM.nextInt(20, 30);
         int numRooms = RANDOM.nextInt(10, 20);
         int curHall = 0;
         int curRooms = 0;
@@ -77,27 +77,26 @@ public class World {
 
         while (curRooms <= numRooms) {
             int d = RANDOM.nextInt(4);
-            coordinate p = null;
             if (d == 0 && rightEnds.size() != 0) {
-                p = rightEnds.get(RANDOM.nextInt(rightEnds.size()));
+                coordinate p = rightEnds.get(RANDOM.nextInt(rightEnds.size()));
                 if (createRoom(p)) {
                     rightEnds.remove(p);
                     curRooms++;
                 }
             } else if (d == 1 && leftEnds.size() != 0) {
-                p = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
+                coordinate p = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
                 if (createRoom(p)) {
                     leftEnds.remove(p);
                     curRooms++;
                 }
             } else if (d == 2 && upEnds.size() != 0) {
-                p = upEnds.get(RANDOM.nextInt(upEnds.size()));
+                coordinate p = upEnds.get(RANDOM.nextInt(upEnds.size()));
                 if (createRoom(p)) {
                     upEnds.remove(p);
                     curRooms++;
                 }
             } else if (d == 3 && downEnds.size() != 0) {
-                p = downEnds.get(RANDOM.nextInt(downEnds.size()));
+                coordinate p = downEnds.get(RANDOM.nextInt(downEnds.size()));
                 if (createRoom(p)) {
                     downEnds.remove(p);
                     curRooms++;
@@ -128,21 +127,25 @@ public class World {
         return true;
     }
 
-    private Boolean createRoom(coordinate p) {
+    private boolean createRoom(coordinate p) {
         int roomWidth1 = RANDOM.nextInt(1, 5);
         int roomHeight1 = RANDOM.nextInt(1, 4);
-        int roomWidth2 = RANDOM.nextInt(1, 5);
-        int roomHeight2 = RANDOM.nextInt(1, 4);
+        int roomWidth2 = RANDOM.nextInt(2, 5);
+        int roomHeight2 = RANDOM.nextInt(2, 4);
 
         coordinate start = new coordinate(p.x() - roomWidth1, p.y() - roomHeight1);
         coordinate end = new coordinate(p.x() + roomWidth2, p.y() + roomHeight2);
 
+        return createRoomHelper(start, end);
+    }
+
+    private boolean createRoomHelper(coordinate start, coordinate end) {
         if (!isValid(start) || !isValid(end)) {
             return false;
         }
 
         for (int i = start.x(); i < end.x(); i++) {
-            for (int j = end.y(); j < start.y(); j++) {
+            for (int j = start.y(); j < end.y(); j++) {
                 tiles[i][j] = Tileset.FLOOR;
             }
         }
@@ -150,7 +153,7 @@ public class World {
         return true;
     }
 
-    private Boolean HorizontalHall(int direction, coordinate start, int length) {
+    private boolean HorizontalHall(int direction, coordinate start, int length) {
         int x = start.x();
         int y = start.y();
         if (!isValid(new coordinate(x + direction * length, y))) {
@@ -201,7 +204,7 @@ public class World {
         return true;
     }
 
-    private Boolean VerticalHall(int direction, coordinate start, int length) {
+    private boolean VerticalHall(int direction, coordinate start, int length) {
         int x = start.x();
         int y = start.y();
 
@@ -252,15 +255,15 @@ public class World {
         return true;
     }
 
-    private Boolean isValid(int x, int y) {
+    private boolean isValid(int x, int y) {
         return 0 < x && x < w - 1 && 0 < y && y < h - 1;
     }
 
-    private Boolean isValid(coordinate p) {
+    private boolean isValid(coordinate p) {
         return isValid(p.x(), p.y());
     }
 
-    private Boolean isValidEnd(int x, int y, String direction) {
+    private boolean isValidEnd(int x, int y, String direction) {
         int changeX = 0;
         int changeY = 0;
         if (direction.equals("left")) {
