@@ -27,7 +27,7 @@ public class Menu {
         //title
         Font fontBig = new Font("Monaco", Font.BOLD, 60);
         StdDraw.setFont(fontBig);
-        StdDraw.text(this.width / 2, this.height / 2, "The Game");
+        StdDraw.text(this.width / 2, this.height / 2, "Maze Master");
 
         //menu
         Font fontSmall = new Font("Monaco", Font.BOLD, 20);
