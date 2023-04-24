@@ -83,7 +83,7 @@ public class TERenderer {
      * the screen in tiles.
      * @param world the 2D TETile[][] array to render
      */
-    public void renderFrame(TETile[][] world) {
+    public void renderFrame(TETile[][] world, String block) {
         int numXTiles = world.length;
         int numYTiles = world[0].length;
         StdDraw.clear(new Color(0, 0, 0));
@@ -96,6 +96,9 @@ public class TERenderer {
                 world[x][y].draw(x + xOffset, y + yOffset);
             }
         }
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.text(7,height-2, "you see " + block);
+        StdDraw.text(width - 15,height - 2, "press :Q to quit    press C to change avatar skin");
         StdDraw.show();
     }
 

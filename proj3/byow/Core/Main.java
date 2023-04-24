@@ -20,7 +20,7 @@ public class Main {
             //System.out.println(engine.toString());
             TERenderer ter = new TERenderer();
             ter.initialize(80, 40);
-            ter.renderFrame(t);
+            ter.renderFrame(t, "");
         } else {
             Engine engine = new Engine();
             engine.interactWithKeyboard();

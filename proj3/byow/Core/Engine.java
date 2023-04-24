@@ -35,7 +35,7 @@ public class Engine {
     private World world;
     private Menu menu;
     private Avatar person;
-    public static final TETile PERSON = new TETile('@', Color.white, Color.black, "you", Paths.get("byow", "img", "person.png").toString());
+    private String userInput;
 
     private boolean gameStart;
 
@@ -68,7 +68,7 @@ public class Engine {
                 } else if (c == 'l') { //load
                     load();
                 } else if (c == 'c') { //change avatar
-
+                    person = new Avatar(Tileset.FLOWER, tiles);
                 } else { // new game
                     drawFrame("Enter a seed ending with s: " + input);
                     if (c == 's') {
@@ -81,18 +81,39 @@ public class Engine {
 
         //game
         gameStart = true;
-        tiles = interactWithInputString(input);
+        input = input.toLowerCase();
+        userInput = input;
+        InputSource inputSource = new StringInputDevice(input);
+        String seeds = "";
+        while (inputSource.possibleNextInput()) {
+            char c1 = inputSource.getNextKey();
+            if (c1 == 'n') {
+                seeds = "";
+            } else if (c1 == 's') {
+                break;
+            } else {
+                seeds = seeds + c1;
+            }
+        }
+        SEED = Long.parseLong(seeds);
+        World w = new World(seeds, WIDTH, HEIGHT);
+        tiles = w.getTiles();
+
+        String block = "";
         ter.initialize(WIDTH, HEIGHT);
-        ter.renderFrame(tiles);
+        ter.renderFrame(tiles, block);
+        tiles = person.initialize(tiles);
 
         input = "";
         //game start
         while (gameStart) {
+            block = blockAt(ter);
+            ter.renderFrame(tiles, block);
             if (StdDraw.hasNextKeyTyped()) {
                 c = Character.toLowerCase(StdDraw.nextKeyTyped());
                 if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
-                    // AvatarMove(c);
-                    ter.renderFrame(tiles);
+                    AvatarMove(c);
+                    ter.renderFrame(tiles, block);
                 } else if (c == 'l') {
                     load();
                 } else {
@@ -103,6 +124,7 @@ public class Engine {
                 }
             }
         }
+        userInput += input;
     }
 
     /**
@@ -135,32 +157,53 @@ public class Engine {
         // that works for many different input types.
 
         input = input.toLowerCase();
-        InputSource inputSource = new StringInputDevice(input);
         String seeds = "";
+        String movement = "";
+        char firstChar = input.charAt(0);
+        if (firstChar == 'l') { //load
+            load(); //gets seed
+            movement = input.substring(0);
+        } else if (firstChar == 'n') { //new game
+            int seedEnd = input.indexOf('s');
+            seeds = input.substring(1, seedEnd - 1);
+            movement = input.substring(seedEnd);
+            SEED = Long.parseLong(seeds);
+            World w = new World(Long.toString(SEED), WIDTH, HEIGHT);
+            tiles = w.getTiles();
+        }
+
+        String block = "";
+        ter.initialize(WIDTH, HEIGHT);
+        block = blockAt(ter);
+        ter.renderFrame(tiles, block);
+        tiles = person.initialize(tiles);
+
+        String notValid = "";
+        InputSource inputSource = new StringInputDevice(movement);
         while (inputSource.possibleNextInput()) {
             char c = inputSource.getNextKey();
-            if (c == 'n') {
-                seeds = "";
-            } else if (c == 's') {
-                break;
+            if (c == 'w' || c == 'a' || c == 's' || c == 'd') {
+                AvatarMove(c);
+                ter.renderFrame(tiles, block);
             } else {
-                seeds = seeds + c;
+                notValid = notValid + c;
+            }
+            if (notValid.equals(":q")) {
+                saveAndQuit();
             }
         }
-        World w = new World(seeds, WIDTH, HEIGHT);
-        tiles = w.getTiles();
 
-        //String block = ""；
-        //TERenderer r = new TERenderer();
-        //r.initialize(82, 32, 1, 1);
-        //r.renderFrame(...);
-        tiles = person.initialize(tiles);
-        while (inputSource.possibleNextInput()) {
-            //block = blockAt(r);
-            //r.renderFrame1(...);
-            char c = inputSource.getNextKey();
-            AvatarMove(c);
-        }
+////        TERenderer r = new TERenderer();
+////        r.initialize(82, 32, 1, 1);
+////        r.renderFrame(...);
+//        tiles = person.initialize(tiles);
+//        while (inputSource.possibleNextInput()) {
+//            //block = blockAt(r);
+//            //r.renderFrame1(...);
+//            char c = inputSource.getNextKey();
+//            AvatarMove(c);
+//            ter.renderFrame(tiles, "");
+//        }
         return tiles;
     }
 
@@ -173,24 +216,51 @@ public class Engine {
         }
         In in = new In(path.toFile());
         String line = in.readLine();
-        String[] input = line.split(",");
+        String[] lineArray;
         if (line != null) {
-            input = line.split(",");
-            //   SEED = Long.parseLong(input[1]); // seed
-            tiles = interactWithInputString(input[1]);
-            ter.renderFrame(tiles);
+            lineArray = line.split(",");
+            SEED = Long.parseLong(lineArray[0]);
+            int avatarX = Integer.parseInt(lineArray[1]);
+            int avatarY = Integer.parseInt(lineArray[2]);
+            String savedUserInput = lineArray[3];
+
+            tiles = interactWithInputString(savedUserInput);
+            ter.renderFrame(tiles, "");
             // tiles = person.move(); person position
         }
+    }
 
+    public void replayLastSave() {
+        Path path = Paths.get("savegame.txt");
+
+        if (!Files.exists(path)) {
+            System.exit(0);
+        }
+        In in = new In(path.toFile());
+        String line = in.readLine();
+        String[] lineArray;
+        if (line != null) {
+            lineArray = line.split(",");
+            SEED = Long.parseLong(lineArray[0]);
+            int avatarX = Integer.parseInt(lineArray[1]);
+            int avatarY = Integer.parseInt(lineArray[2]);
+            String savedUserInput = lineArray[3];
+
+            tiles = interactWithInputString(lineArray[0]);
+
+
+            ter.renderFrame(tiles, "");
+            // tiles = person.move(); person position
+
+        }
     }
 
 
     public void saveAndQuit() {
         Out out = new Out("savegame.txt");
-        //seed, avatarX, avatarY
-        out.print("1267,20,30");
-        // out.print(SEED + "" + "," + "person.getPositionX()" + "," + "person.getPositionY()");
-
+        //seed, avatarX, avatarY, userInput
+        String saved = SEED + "," + person.getPositionX() + "," + person.getPositionY() + "," + userInput;
+        out.print(saved);
         System.exit(0);
     }
 
@@ -198,10 +268,11 @@ public class Engine {
         Engine engine = new Engine();
         //engine.interactWithKeyboard();
 
-        TETile[][] t = engine.interactWithInputString("N92054114S");
+        // TETile[][] t = engine.interactWithInputString("N92054114S");
+        TETile[][] t = engine.interactWithInputString("N6647S");
         TERenderer ter = new TERenderer();
         ter.initialize(80, 40);
-        ter.renderFrame(t);
+        ter.renderFrame(t, "");
     }
 
     //@source lab13
@@ -263,13 +334,6 @@ public class Engine {
         if (c == 'd' || c == 'D') {
             tiles = person.moveRight();
         }
-    }
-
-    public void resetWorld() {
-        tiles = new TETile[WIDTH][HEIGHT];
-    }
-
-    private record pair(int x, int y) {
     }
 
 }

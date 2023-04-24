@@ -12,7 +12,7 @@ public class World {
     private final ArrayList<pair> hallStart = new ArrayList<>();
     private final ArrayList<pair> hallEnd = new ArrayList<>();
     private final ArrayList<Integer> hallDirection = new ArrayList<>(); //0 = up, 2 = right
-    private final int stopChance = 3;
+    private final int stopChance = 2;
 
     private final ArrayList<pair> LeftBottom = new ArrayList<>();
     private final ArrayList<pair> RightTop = new ArrayList<>();
@@ -29,7 +29,7 @@ public class World {
         this.w = width;
         this.h = height;
 
-        int numHalls = RANDOM.nextInt(30, 50);
+        int numHalls = RANDOM.nextInt(50, 80);
         int curHalls = 0;
 
         tiles = new TETile[w][h];

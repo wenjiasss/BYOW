@@ -7,8 +7,11 @@ import byow.TileEngine.Tileset;
 public class Avatar {
 
     private TETile skin;
-    private pair position;
+    private coordinate position;
     private TETile[][] tiles;
+
+    //public static final TETile PERSON = new TETile('@', Color.white, Color.black, "you", Paths.get("byow", "img", "person.png").toString());
+    //  public static final TETile CAT = new TETile('$', Color.white, Color.black, "you", Paths.get("byow", "img", "cat.png").toString());
 
     public Avatar(TETile s, TETile[][] t) {
         this.skin = s;
@@ -16,94 +19,75 @@ public class Avatar {
     }
 
     public TETile[][] initialize(TETile[][] t) {
-        updateTiles(t);
+        tiles = t;
         for (int i  = 0; i < tiles.length; i++) {
             for (int j  = 0; j < tiles[0].length; j++) {
                 if (movable(i, j)) {
                     tiles[i][j] = this.skin;
-                    move(new pair(i, j));
+                    move(new coordinate(i, j));
                     break;
                 }
             }
-            if (this.position!=null) {
+            if (position!=null) {
                 break;
             }
         }
         return tiles;
     }
 
-    private void updateTiles(TETile[][] t) {
-        tiles = t;
+    private void move(coordinate p) {
+        int x = position.x();
+        int y = position.y();
+        tiles[x][y] = Tileset.FLOOR;
+        this.position = p;
+        int newX = position.x();
+        int newY = position.y();
+        tiles[newX][newY] = this.skin;
     }
 
-    private void move(pair pos) {
-        this.position = pos;
-    }
     private boolean movable(int x, int y) {
-        return isValid(x, y) && (tiles[x][y].equals(Tileset.FLOOR));
+        return 0 < x && x < tiles.length - 1 && 0 < y && y < tiles[0].length - 1 && (tiles[x][y].equals(Tileset.FLOOR));
     }
-    private Boolean isValid(int x, int y) {
-        return x >= 1 && x < tiles.length - 1 && y >= 1 && y < tiles[0].length - 1;
+
+    public TETile[][] moving(int v, int h) {
+        int newX = position.x();
+        int newY = position.y();
+        if (v != 0) {
+            newY = newY + v;
+        } else if (h != 0) {
+            newX = newX + h;
+        }
+        if (movable(newX, newY)) {
+            move(new coordinate(newX, newY));
+        }
+        return tiles;
     }
 
     public TETile[][] moveUp() {
-        int newposx = this.position.x();
-        int newposy = this.position.y() + 1;
-        if (movable(newposx, newposy)) {
-            tiles[newposx][newposy] = this.skin;
-            tiles[newposx][newposy - 1] = Tileset.FLOOR;
-            this.move(new pair(newposx, newposy));
-        }
-        return tiles;
+        return moving(1, 0);
     }
     public TETile[][] moveDown() {
-        int newposx = this.position.x();
-        int newposy = this.position.y() - 1;
-        if (movable(newposx, newposy)) {
-            tiles[newposx][newposy] = this.skin;
-            tiles[newposx][newposy + 1] = Tileset.FLOOR;
-            this.move(new pair(newposx, newposy));
-        }
-        return tiles;
+        return moving(-1, 0);
     }
     public TETile[][] moveRight() {
-        int newposx = this.position.x() + 1;
-        int newposy = this.position.y();
-        if (movable(newposx, newposy)) {
-            tiles[newposx][newposy] = this.skin;
-            tiles[newposx - 1][newposy] = Tileset.FLOOR;
-            this.move(new pair(newposx, newposy));
-        }
-        return tiles;
+        return moving(0, 1);
     }
     public TETile[][] moveLeft() {
-        int newposx = this.position.x() - 1;
-        int newposy = this.position.y();
-        if (movable(newposx, newposy)) {
-            tiles[newposx][newposy] = this.skin;
-            tiles[newposx + 1][newposy] = Tileset.FLOOR;
-            this.move(new pair(newposx, newposy));
-        }
-        return tiles;
+        return moving(0, -1);
     }
 
     public TETile getSkin() {
         return skin;
     }
 
-    public TETile[][] getTiles() {
-        return tiles;
-    }
-
-    private record pair(int x, int y) {
-    }
-
     public String getPositionX() {
-        return ""+ position.x;
+        return Integer.toString(position.x());
     }
+
     public String getPositionY() {
-        return ""+ position.y;
+        return Integer.toString(position.y());
     }
 
-
+    private record coordinate(int x, int y) {
+    }
 }
