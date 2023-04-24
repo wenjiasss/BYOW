@@ -69,11 +69,11 @@ public class breakWalls {
         pair p1 = helper4(i, j + 2, 0, 1);
         pair p2 = helper4(i + 2, j, 1, 0);
         if (t[i][j + 1] == Tileset.WALL && p1 != null && helper3(i, j + 1, p1, true)) {
-            for (int k = j + 1; k < p1.y()-1; k++) {
+            for (int k = j + 1; k < p1.y() - 1; k++) {
                 t[i][k] = Tileset.FLOOR;
             }
         } else if (t[i + 1][j] == Tileset.WALL && p2 != null && helper3(i + 1, j, p2, false)) {
-            for (int k = i + 1; k < p2.x()-1; k++) {
+            for (int k = i + 1; k < p2.x() - 1; k++) {
                 t[k][j] = Tileset.FLOOR;
             }
         }

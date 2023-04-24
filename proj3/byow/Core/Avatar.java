@@ -20,15 +20,15 @@ public class Avatar {
 
     public TETile[][] initialize(TETile[][] t) {
         tiles = t;
-        for (int i  = 0; i < tiles.length; i++) {
-            for (int j  = 0; j < tiles[0].length; j++) {
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[0].length; j++) {
                 if (movable(i, j)) {
                     tiles[i][j] = this.skin;
                     move(new coordinate(i, j));
                     break;
                 }
             }
-            if (position!=null) {
+            if (position != null) {
                 break;
             }
         }
@@ -66,12 +66,15 @@ public class Avatar {
     public TETile[][] moveUp() {
         return moving(1, 0);
     }
+
     public TETile[][] moveDown() {
         return moving(-1, 0);
     }
+
     public TETile[][] moveRight() {
         return moving(0, 1);
     }
+
     public TETile[][] moveLeft() {
         return moving(0, -1);
     }
@@ -86,6 +89,13 @@ public class Avatar {
 
     public String getPositionY() {
         return Integer.toString(position.y());
+    }
+
+    public void changePosition(int x, int y) {
+        coordinate c = new coordinate(x, y);
+        if (movable(x, y)) {
+            this.move(c);
+        }
     }
 
     private record coordinate(int x, int y) {

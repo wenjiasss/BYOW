@@ -223,7 +223,7 @@ public class Engine {
             int avatarX = Integer.parseInt(lineArray[1]);
             int avatarY = Integer.parseInt(lineArray[2]);
             String savedUserInput = lineArray[3];
-
+            person.changePosition(avatarX, avatarY);
             tiles = interactWithInputString(savedUserInput);
             ter.renderFrame(tiles, "");
             // tiles = person.move(); person position
@@ -246,8 +246,6 @@ public class Engine {
             int avatarY = Integer.parseInt(lineArray[2]);
             String savedUserInput = lineArray[3];
 
-            tiles = interactWithInputString(lineArray[0]);
-
 
             ter.renderFrame(tiles, "");
             // tiles = person.move(); person position
@@ -269,7 +267,7 @@ public class Engine {
         //engine.interactWithKeyboard();
 
         // TETile[][] t = engine.interactWithInputString("N92054114S");
-       // TETile[][] t = engine.interactWithInputString("N6647S");
+        // TETile[][] t = engine.interactWithInputString("N6647S");
         TETile[][] t = engine.interactWithInputString("N999SDDD:Q");
         TERenderer ter = new TERenderer();
         ter.initialize(80, 40);
