@@ -272,7 +272,7 @@ public class Engine {
             savedUserInput = savedUserInput.toLowerCase();
 
             if(savedUserInput.contains(":q")){
-                String part1 = savedUserInput.substring(0,savedUserInput.indexOf(":")-1);
+                String part1 = savedUserInput.substring(0,savedUserInput.indexOf(":"));
                 String part2 = savedUserInput.substring(savedUserInput.indexOf(":")+1);
                 savedUserInput = part1+part2;
             }
