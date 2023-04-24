@@ -269,7 +269,8 @@ public class Engine {
         //engine.interactWithKeyboard();
 
         // TETile[][] t = engine.interactWithInputString("N92054114S");
-        TETile[][] t = engine.interactWithInputString("N6647S");
+       // TETile[][] t = engine.interactWithInputString("N6647S");
+        TETile[][] t = engine.interactWithInputString("N999SDDD:Q");
         TERenderer ter = new TERenderer();
         ter.initialize(80, 40);
         ter.renderFrame(t, "");

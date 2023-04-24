@@ -260,6 +260,8 @@ public class ConnectedWorld {
     }
 
     private Boolean isValidEnd(int x, int y, String direction) {
+        int changeX = 0;
+        int changeY = 0;
         if (direction.equals("left")) {
             if (tiles[x-1][y+1] == Tileset.FLOOR && tiles[x-2][y+1] == Tileset.FLOOR) {
                 return false;
