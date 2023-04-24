@@ -1,33 +1,25 @@
 package byow.Core;
 
-import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
 
 public class ConnectedWorld {
 
+
+    private static final int LENGTH_HALL = 20;
+    private static final int MIN_LENGTH = 15;
     private final ArrayList<coordinate> leftEnds = new ArrayList<>();
     private final ArrayList<coordinate> rightEnds = new ArrayList<>();
     private final ArrayList<coordinate> upEnds = new ArrayList<>();
     private final ArrayList<coordinate> downEnds = new ArrayList<>();
-    private ArrayList<Integer> directions;
-    private static final int LENGTH_HALL = 20;
-    private static final int MIN_LENGTH = 15;
-    private final int stopChance = 2;
-
-    private final ArrayList<coordinate> LeftBottom = new ArrayList<>();
-    private final ArrayList<coordinate> RightTop = new ArrayList<>();
+    private int w;
+    private int h;
     private Random RANDOM;
     private TETile[][] tiles;
-    /* Feel free to change the width and height. */
-    public int w;
-    public int h;
-
 
     private TETile[][] ConnectedWorld(String seed, int width, int height) {
         Long s = Long.parseLong(seed);
@@ -35,10 +27,10 @@ public class ConnectedWorld {
         this.w = width;
         this.h = height;
 
-        int numHalls = RANDOM.nextInt(50,80);
-        int numRooms = RANDOM.nextInt(10,20);
-        int curNumHall = 0;
-        int curNumRooms = 0;
+        int numHalls = RANDOM.nextInt(50, 80);
+        int numRooms = RANDOM.nextInt(10, 20);
+        int curHall = 0;
+        int curRooms = 0;
 
         tiles = new TETile[w][h];
         for (int i = 0; i < w; i++) {
@@ -47,8 +39,8 @@ public class ConnectedWorld {
             }
         }
 
-        int firstX = RANDOM.nextInt(5, w-5);
-        int firstY = RANDOM.nextInt(5, h-5);
+        int firstX = RANDOM.nextInt(5, w - 5);
+        int firstY = RANDOM.nextInt(5, h - 5);
         coordinate coordinate = new coordinate(firstX, firstY);
         leftEnds.add(coordinate);
         rightEnds.add(coordinate);
@@ -56,96 +48,108 @@ public class ConnectedWorld {
         downEnds.add(coordinate);
 
 
-        while (curNumHall <= numHalls) {
+        while (curHall <= numHalls) {
             int d = RANDOM.nextInt(4);
-            if (d == 0 && leftEnds.size() != 0) {
-                coordinate start = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
-                if (HorizontalHall(-1, start, RANDOM.nextInt(6, LENGTH_HALL) )) {
-                    leftEnds.remove(start);
-                    curNumHall += 1;
-                }
-            } else if (d == 1 && rightEnds.size() != 0) {
+            if (d == 0 && rightEnds.size() != 0) {
                 coordinate start = rightEnds.get(RANDOM.nextInt(rightEnds.size()));
-                if (HorizontalHall(1, start, RANDOM.nextInt(6, LENGTH_HALL) )) {
+                if (HorizontalHall(1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
                     rightEnds.remove(start);
-                    curNumHall += 1;
+                    curHall++;
+                }
+            } else if (d == 1 && leftEnds.size() != 0) {
+                coordinate start = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
+                if (HorizontalHall(-1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
+                    leftEnds.remove(start);
+                    curHall++;
                 }
             } else if (d == 2 && upEnds.size() != 0) {
                 coordinate start = upEnds.get(RANDOM.nextInt(upEnds.size()));
                 if (VerticalHall(1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
-                    curNumHall += 1;
                     upEnds.remove(start);
+                    curHall++;
                 }
             } else if (d == 3 && downEnds.size() != 0) {
                 coordinate start = downEnds.get(RANDOM.nextInt(downEnds.size()));
                 if (VerticalHall(-1, start, RANDOM.nextInt(6, LENGTH_HALL))) {
-                    curNumHall += 1;
                     downEnds.remove(start);
+                    curHall++;
                 }
             }
         }
 
-        while (curNumRooms <= numRooms) {
+        while (curRooms <= numRooms) {
             int d = RANDOM.nextInt(4);
-            if (d == 0 && leftEnds.size() != 0) {
-                coordinate start = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
-                int endy = start.y() - RANDOM.nextInt(5);
-                coordinate end = new coordinate(start.x(), endy);
-                int startx = start.x() - RANDOM.nextInt(2, 8);
-                int starty = start.y() + RANDOM.nextInt(2, 5);
-                coordinate roomstart = new coordinate(startx, starty);
-                if (createRoom(roomstart, end)){
-                    leftEnds.remove(start);
-                    curNumRooms += 1;
+            coordinate p = null;
+            if (d == 0 && rightEnds.size() != 0) {
+                p = rightEnds.get(RANDOM.nextInt(rightEnds.size()));
+                if (createRoom(p)) {
+                    rightEnds.remove(p);
+                    curRooms++;
                 }
-            } else if (d == 1 && rightEnds.size() != 0) {
-                coordinate start = rightEnds.get(RANDOM.nextInt(rightEnds.size()));
-                int endy = start.y() + RANDOM.nextInt(5);
-                coordinate end = new coordinate(start.x(), endy);
-                int startx = start.x() + RANDOM.nextInt(2, 8);
-                int starty = start.y() - RANDOM.nextInt(2, 5);
-                coordinate roomstart = new coordinate(startx, starty);
-                if (createRoom(end, roomstart)){
-                    rightEnds.remove(start);
-                    curNumRooms += 1;
+            } else if (d == 1 && leftEnds.size() != 0) {
+                p = leftEnds.get(RANDOM.nextInt(leftEnds.size()));
+                if (createRoom(p)) {
+                    leftEnds.remove(p);
+                    curRooms++;
                 }
             } else if (d == 2 && upEnds.size() != 0) {
-                coordinate start = upEnds.get(RANDOM.nextInt(upEnds.size()));
-                int endx = start.x() + RANDOM.nextInt(5);
-                coordinate end = new coordinate(endx, start.y());
-                int startx = start.x() - RANDOM.nextInt(2, 8);
-                int starty = start.y() + RANDOM.nextInt(2, 5);
-                coordinate roomstart = new coordinate(startx, starty);
-                if (createRoom(end, roomstart)){
-                    upEnds.remove(start);
-                    curNumRooms += 1;
+                p = upEnds.get(RANDOM.nextInt(upEnds.size()));
+                if (createRoom(p)) {
+                    upEnds.remove(p);
+                    curRooms++;
                 }
             } else if (d == 3 && downEnds.size() != 0) {
-                coordinate start = downEnds.get(RANDOM.nextInt(downEnds.size()));
-                int endx = start.x() - RANDOM.nextInt(5);
-                coordinate end = new coordinate(endx, start.y());
-                int startx = start.x() + RANDOM.nextInt(2, 8);
-                int starty = start.y() - RANDOM.nextInt(2, 5);
-                coordinate roomstart = new coordinate(startx, starty);
-                if (createRoom(end, roomstart)){
-                    downEnds.remove(start);
-                    curNumRooms += 1;
+                p = downEnds.get(RANDOM.nextInt(downEnds.size()));
+                if (createRoom(p)) {
+                    downEnds.remove(p);
+                    curRooms++;
                 }
             }
         }
-
-        return new TETile[0][];
+        breakWalls();
+        return tiles;
     }
 
-    private Boolean createRoom(coordinate start, coordinate end) {
+    private void breakWalls() {
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                if (uselessWall(i, j)) {
+                    tiles[i][j] = Tileset.NOTHING;
+                }
+            }
+        }
+    }
+
+    private boolean uselessWall(int x, int y) {
+        for (int i = x - 1; i < x + 2; i++) {
+            for (int j = y - 1; j < y + 2; j++) {
+                if (isValid(i, j) && tiles[i][j] == Tileset.FLOOR) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private Boolean createRoom(coordinate p) {
+        int roomWidth1 = RANDOM.nextInt(1, 5);
+        int roomHeight1 = RANDOM.nextInt(1, 4);
+        int roomWidth2 = RANDOM.nextInt(1, 5);
+        int roomHeight2 = RANDOM.nextInt(1, 4);
+
+        coordinate start = new coordinate(p.x() - roomWidth1, p.y() - roomHeight1);
+        coordinate end = new coordinate(p.x() + roomWidth2, p.y() + roomHeight2);
+
         if (!isValid(start) || !isValid(end)) {
             return false;
         }
+
         for (int i = start.x(); i < end.x(); i++) {
             for (int j = end.y(); j < start.y(); j++) {
                 tiles[i][j] = Tileset.FLOOR;
             }
         }
+
         return true;
     }
 
@@ -156,7 +160,7 @@ public class ConnectedWorld {
             return false;
         }
 
-        if (direction == 1 && !isValidEnd(x, y, "left")) {
+        if (direction == 1 && !isValidEnd(x, y, "right")) {
             rightEnds.remove(start);
             return false;
         } else if (direction == -1 && !isValidEnd(x, y, "left")) {
@@ -171,7 +175,7 @@ public class ConnectedWorld {
 
         int diverge = RANDOM.nextInt(2);
         if (length >= MIN_LENGTH && diverge == 1) {
-            int midX = start.x() + direction * RANDOM.nextInt(3, length-3);
+            int midX = start.x() + direction * RANDOM.nextInt(3, length - 3);
             if (isValidEnd(midX, y, "down")) {
                 downEnds.add(new coordinate(midX, y));
             }
@@ -193,7 +197,7 @@ public class ConnectedWorld {
         if (isValidEnd(x, y, "up")) {
             upEnds.add(new coordinate(x, y));
         }
-        if (isValidEnd(x,y, "down")) {
+        if (isValidEnd(x, y, "down")) {
             downEnds.add(new coordinate(x, y));
         }
 
@@ -223,7 +227,7 @@ public class ConnectedWorld {
 
         int midornot = RANDOM.nextInt(2);
         if (length >= MIN_LENGTH && midornot == 1) {
-            int midY = start.y() + direction * RANDOM.nextInt(3, length-3);
+            int midY = start.y() + direction * RANDOM.nextInt(3, length - 3);
             if (isValidEnd(x, midY, "left")) {
                 leftEnds.add(new coordinate(x, midY));
             }
@@ -232,7 +236,7 @@ public class ConnectedWorld {
             }
         }
 
-        y = y-direction;
+        y = y - direction;
         if (direction == 1) {
             if (isValidEnd(x, y, "up")) {
                 upEnds.add(new coordinate(x, y));
@@ -251,45 +255,37 @@ public class ConnectedWorld {
         return true;
     }
 
-    private Boolean isValid(coordinate p) {
-        return isValid(p.x(), p.y());
-    }
-
     private Boolean isValid(int x, int y) {
         return 0 < x && x < w - 1 && 0 < y && y < h - 1;
+    }
+
+    private Boolean isValid(coordinate p) {
+        return isValid(p.x(), p.y());
     }
 
     private Boolean isValidEnd(int x, int y, String direction) {
         int changeX = 0;
         int changeY = 0;
         if (direction.equals("left")) {
-            if (tiles[x-1][y+1] == Tileset.FLOOR && tiles[x-2][y+1] == Tileset.FLOOR) {
+            if (tiles[x - 1][y + 1] == Tileset.FLOOR && tiles[x - 2][y + 1] == Tileset.FLOOR) {
                 return false;
             }
-            if (tiles[x-1][y-1] == Tileset.FLOOR && tiles[x-2][y-1] == Tileset.FLOOR) {
-                return false;
-            }
+            return tiles[x - 1][y - 1] != Tileset.FLOOR || tiles[x - 2][y - 1] != Tileset.FLOOR;
         } else if (direction.equals("right")) {
-            if (tiles[x+1][y+1] == Tileset.FLOOR && tiles[x+2][y+1] == Tileset.FLOOR) {
+            if (tiles[x + 1][y + 1] == Tileset.FLOOR && tiles[x + 2][y + 1] == Tileset.FLOOR) {
                 return false;
             }
-            if (tiles[x+1][y-1] == Tileset.FLOOR && tiles[x+2][y-1] == Tileset.FLOOR) {
-                return false;
-            }
+            return tiles[x + 1][y - 1] != Tileset.FLOOR || tiles[x + 2][y - 1] != Tileset.FLOOR;
         } else if (direction.equals("up")) {
-            if (tiles[x-1][y+1] == Tileset.FLOOR && tiles[x-1][y+2] == Tileset.FLOOR) {
+            if (tiles[x - 1][y + 1] == Tileset.FLOOR && tiles[x - 1][y + 2] == Tileset.FLOOR) {
                 return false;
             }
-            if (tiles[x+1][y+1] == Tileset.FLOOR && tiles[x+1][y+2] == Tileset.FLOOR) {
-                return false;
-            }
+            return tiles[x + 1][y + 1] != Tileset.FLOOR || tiles[x + 1][y + 2] != Tileset.FLOOR;
         } else if (direction.equals("down")) {
-            if (tiles[x-1][y-1] == Tileset.FLOOR && tiles[x-1][y-2] == Tileset.FLOOR) {
+            if (tiles[x - 1][y - 1] == Tileset.FLOOR && tiles[x - 1][y - 2] == Tileset.FLOOR) {
                 return false;
             }
-            if (tiles[x+1][y-1] == Tileset.FLOOR && tiles[x+1][y-2] == Tileset.FLOOR) {
-                return false;
-            }
+            return tiles[x + 1][y - 1] != Tileset.FLOOR || tiles[x + 1][y - 2] != Tileset.FLOOR;
         }
         return true;
     }
