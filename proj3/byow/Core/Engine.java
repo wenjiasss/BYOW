@@ -37,17 +37,17 @@ public class Engine {
         gameStart = false;
     }
 
-    public static void main(String[] args) {
-        Engine engine = new Engine();
-        //engine.interactWithKeyboard();
-
-        // TETile[][] t = engine.interactWithInputString("N92054114S");
-        //   TETile[][] t = engine.interactWithInputString("N6647S");
-        TETile[][] t = engine.interactWithInputString("LWWWDDD");
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
-        ter.renderFrame(t, "");
-    }
+//    public static void main(String[] args) {
+//        Engine engine = new Engine();
+//        //engine.interactWithKeyboard();
+//
+//        // TETile[][] t = engine.interactWithInputString("N92054114S");
+//        //   TETile[][] t = engine.interactWithInputString("N6647S");
+//        TETile[][] t = engine.interactWithInputString("LWWWDDD");
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(WIDTH, HEIGHT);
+//        ter.renderFrame(t, "");
+//    }
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
