@@ -244,8 +244,9 @@ public class Engine {
             SEED = Long.parseLong(lineArray[0]);
             String savedUserInput = lineArray[1];
             if(savedUserInput.contains(":q")){
-                userInput = savedUserInput.replace(":q", "");
+                savedUserInput = savedUserInput.replace(":q", "");
             }
+            userInput = savedUserInput;
             tiles = interactWithInputString(userInput);
             if(userInput.contains(":q")){
                 userInput = userInput.replace(":q", "");

@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-1221,n1221sdddsswwwdddddddddddd:q
-=======
-89022,n89022sddwaas:q
->>>>>>> 1febcdfa2e89193b247c82699b8a2f50c8a43e3e
+111,n111sdddddddwwwwwddddddddddddddddddsssswaaa:q
