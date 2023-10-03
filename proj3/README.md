@@ -1,13 +1,6 @@
-# Build Your Own World Design Document
+# Build Your Own World
 
 **Partner 1: Wenjia Song**
 
 **Partner 2: TJ Dong**
 
-## Classes and Data Structures
-
-**Class World**
-**Class Room**
-
-## Algorithms
-## Persistence
